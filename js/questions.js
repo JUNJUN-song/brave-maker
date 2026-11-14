@@ -154,7 +154,7 @@ BM.QUESTION_BANK = {
     ] },
     { id: 'Q02', stage: 'scenario', category: 'mixed', situation: '주말에 갑자기 세 시간의 자유시간이 생겼어.', choices: [
       { text: '가볍게 운동하거나 산책한다.', w: { fit: 4, recovery: 1 }, sr: 2, al: 0, tag: null },
-      { text: '하던 음악이나 게임 제작을 진행한다.', w: { create: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '하던 창작이나 제작 작업을 이어서 한다.', w: { create: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
       { text: '책이나 새로운 기술을 공부한다.', w: { mind: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
       { text: '친구나 가족을 만나러 간다.', w: { care: 3, lead: 2 }, sr: 0, al: 2, tag: null },
       { text: '낮잠이나 반신욕으로 푹 쉬며 몸을 회복한다.', w: { recovery: 4 }, sr: 2, al: 0, tag: null },
@@ -197,7 +197,9 @@ BM.QUESTION_BANK = {
       { text: '가까운 경찰서나 분실물 센터로 가져간다.', w: { divine: 4, discipline: 1 }, sr: 0, al: 3, tag: null },
       { text: '연락처를 확인해 주인에게 돌려줄 방법을 찾는다.', w: { care: 3, mind: 2, divine: 2 }, sr: 0, al: 3, tag: null },
       { text: '주변에 누가 잃어버렸는지 물어본다.', w: { lead: 2, care: 3, divine: 1 }, sr: 0, al: 2, tag: null },
-      { text: '현장을 건드리지 않고 시설 관리인에게 알린다.', w: { mind: 2, discipline: 2, divine: 1 }, sr: 0, al: 2, tag: null }
+      { text: '현장을 건드리지 않고 시설 관리인에게 알린다.', w: { mind: 2, discipline: 2, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '확인만 하고 그 자리에 그대로 둔다.', w: {  }, sr: 0, al: 0, tag: 'inaction' },
+      { text: '지갑 속 현금은 내가 갖는다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
     ] },
     { id: 'Q09', stage: 'scenario', category: 'mixed', situation: '친구가 급하게 돈을 빌려 달라고 하는데 상환 시점은 확실하지 않아.', choices: [
       { text: '친구를 믿고 요청한 금액을 빌려준다.', w: { care: 3, divine: 2 }, sr: -1, al: 3, tag: null },

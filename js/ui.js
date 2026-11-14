@@ -48,8 +48,8 @@ BM.ui = (function () {
   }
 
   // ---------- 보석 ----------
-  function gemSpec(seed, top3, aura, esteem) {
-    return { seed, colors: top3, sr: aura.sr, al: aura.al, esteem: esteem == null ? 5 : esteem };
+  function gemSpec(seed, top3, aura, esteem, stats) {   // stats 가 있으면 색 비율 = 실제 능력치 비율
+    return { seed, colors: top3, sr: aura.sr, al: aura.al, esteem: esteem == null ? 5 : esteem, ratios: BM.gem.statRatios(stats, top3) };
   }
   function mountGem(canvas, spec, reduced) {
     canvas.classList.add('px');
@@ -60,8 +60,9 @@ BM.ui = (function () {
 
   // ---------- 브로치 보석 초상화 ----------
   const LOOK_NAME = { girl: '여자 용사', boy: '남자 용사' };
-  function broochSpec(look, seed, ids, aura) {
-    return { look: look === 'boy' ? 'boy' : 'girl', seed, colors: ids.slice(0, 4), sr: aura ? aura.sr : 0.5, al: aura ? aura.al : 0.5 };
+  function broochSpec(look, seed, ids, aura, stats) {
+    const colors = ids.slice(0, BM.CONFIG.gem.colorCount);
+    return { look: look === 'boy' ? 'boy' : 'girl', seed, colors, sr: aura ? aura.sr : 0.5, al: aura ? aura.al : 0.5, ratios: BM.gem.statRatios(stats, colors) };
   }
   // view: { crop: 숫자 }(브로치 주변만 정사각형으로) | 없음(초상화 전체)
   function mountBrooch(canvas, spec, reduced, view) {
@@ -89,13 +90,13 @@ BM.ui = (function () {
   async function saveResultPNG(name, result, spec) {
     await BM.brooch.ready();
     const b = BM.brooch.build(spec);
-    const art = b ? b.frames[2] : BM.gem.cached(gemSpec(spec.seed, result.top3, result.axes, result.points.esteem)).frames[0];
-    return savePNG(resultCanvas(name, result, art, null, b ? { ids: spec.colors, seed: spec.seed } : null), 'brave-maker-' + name + '.png');
+    const art = b ? b.frames[2] : BM.gem.cached(gemSpec(spec.seed, result.top3, result.axes, result.points.esteem, result.points)).frames[0];
+    return savePNG(resultCanvas(name, result, art, null, b ? { ids: spec.colors, seed: spec.seed, stats: result.points } : null), 'brave-maker-' + name + '.png');
   }
   // 브로치 순위·비율 칩 (1위 ○○ 46% …)
   function broochLegend(ids, seed, opts) {
     opts = opts || {};
-    const top = ids.slice(0, 4), pct = BM.brooch.percents(BM.gem.ratios(seed, top.length));
+    const top = ids.slice(0, BM.CONFIG.gem.colorCount), pct = BM.brooch.percents(BM.gem.statRatios(opts.stats, top) || BM.gem.ratios(seed, top.length));
     const col = id => BM.STAT[id].color;   // 칩은 능력치 색 그대로 (4색 띠는 2026-11-13 사용자 요청으로 뺌)
     return '<div class="brooch-legend">' +
       '<div class="center">' + top.map((id, i) => '<span class="chip" style="--c:' + col(id) + '"><i></i>' + (i + 1) + '위 ' + BM.STAT[id].name + (BM.STAT[id].rare ? '<span class="tag-rare">희귀</span>' : '') + (opts.noPct ? '' : ' <span class="muted">' + pct[i] + '%</span>') + '</span>').join('') + '</div></div>';
@@ -150,35 +151,49 @@ BM.ui = (function () {
   function cloneCanvas(src) { const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; c.getContext('2d').drawImage(src, 0, 0); return c; }
 
   // ---------- 진단 질문 진행 (생활 습관 + 상황) ----------
+  // opts.order 가 있으면 적응형(BM.adaptive): 질문 목록이 답할 때마다 한 개씩 늘어나고(opts.extend), 총 opts.total 문항
   function quiz(root, opts) {
-    const bank = opts.bank, qs = bank.questions;
+    const bank = opts.bank, adaptive = Array.isArray(opts.order);
+    const byId = {}; bank.questions.forEach(q => { byId[q.id] = q; });
+    const list = () => adaptive ? opts.order.map(id => byId[id]).filter(Boolean) : bank.questions;
+    const total = adaptive ? opts.total : bank.questions.length;
+    const answered = x => Number.isInteger(opts.answers[x.id]);
+    if (adaptive) opts.extend();
+    let qs = list();
     let i = U.clamp(opts.cursor || 0, 0, qs.length - 1);
+    const complete = () => adaptive ? BM.adaptive.isComplete(bank, opts.order, opts.answers) : BM.scoring.isComplete(bank, opts.answers);
     function render() {
+      qs = list();
       const q = qs[i], ans = opts.answers[q.id];
       const order = BM.scoring.choiceOrder(q, opts.seed);
-      const done = qs.filter(x => Number.isInteger(opts.answers[x.id])).length;
+      const done = qs.filter(answered).length, last = i === total - 1;
       root.innerHTML =
         '<div class="screen">' +
-        '<div class="q-head"><span class="q-num count">' + String(i + 1).padStart(2, '0') + ' <span class="dim">/ ' + qs.length + '</span></span><span class="small muted">응답 ' + done + '개</span></div>' +
-        '<div class="bar thin" role="progressbar" aria-valuemin="0" aria-valuemax="' + qs.length + '" aria-valuenow="' + done + '"><i style="width:' + (done / qs.length * 100) + '%;--c:var(--gold)"></i></div>' +
-        (q.stage !== 'baseline' && i > 0 && qs[i - 1].stage === 'baseline'
+        '<div class="q-head"><span class="q-num count">' + String(i + 1).padStart(2, '0') + ' <span class="dim">/ ' + total + '</span></span><span class="small muted">응답 ' + done + '개</span></div>' +
+        '<div class="bar thin" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + done + '"><i style="width:' + (done / total * 100) + '%;--c:var(--gold)"></i></div>' +
+        (q.stage !== 'baseline' && i > 0 && i === qs.findIndex(x => x.stage !== 'baseline')
           ? '<p class="small gold" style="margin:4px">여기부터는 상황 질문이에요. 그 상황이라면 실제로 어떻게 할지 골라 주세요.</p>' : '') +
         '<div class="panel dialog" aria-live="polite"><span class="tl">' + (q.stage === 'baseline' ? '생활 습관' + (q.window ? ' · ' + U.esc(q.window) : '') : '상황') + '</span>' + U.esc(q.situation) + '</div>' +
         '<div role="group" aria-label="선택지">' +
         order.map((ci, k) => '<button class="btn choice" data-ci="' + ci + '" aria-pressed="' + (ans === ci) + '"><span class="key">' + (k + 1) + '.</span><span>' + U.esc(q.choices[ci].text) + '</span></button>').join('') +
         '</div>' +
         '<div class="row" style="margin-top:12px"><button class="btn ghost grow" data-nav="prev" ' + (i === 0 ? 'disabled' : '') + '>◀ 이전</button>' +
-        (i < qs.length - 1
+        (!last
           ? '<button class="btn grow" data-nav="next" ' + (Number.isInteger(ans) ? '' : 'disabled') + '>다음 ▶</button>'
-          : '<button class="btn gold grow" data-nav="finish" ' + (done === qs.length ? '' : 'disabled') + '>결과 보기 ★</button>') +
+          : '<button class="btn gold grow" data-nav="finish" ' + (complete() ? '' : 'disabled') + '>결과 보기 ★</button>') +
         '</div>' +
-        (i === qs.length - 1 && done < qs.length ? '<p class="small muted center">아직 답하지 않은 질문이 ' + (qs.length - done) + '개 있어요. <button class="btn sm ghost" data-nav="first-missing">이동</button></p>' : '') +
+        (last && !complete() && qs.some(x => !answered(x)) ? '<p class="small muted center">아직 답하지 않은 질문이 ' + qs.filter(x => !answered(x)).length + '개 있어요. <button class="btn sm ghost" data-nav="first-missing">이동</button></p>' : '') +
+        (adaptive && i === 0 ? '<p class="small muted center" style="margin:6px 0 0">답에 따라 다음 질문이 골라져요 (모두 ' + total + '문항).</p>' : '') +
         (q.stage === 'baseline'
           ? '<p class="notice">최근에 실제로 한 만큼 골라 주세요. 하고 싶은 만큼이 아니라 해 온 만큼이에요. 생활 습관의 자기보고일 뿐, 능력이나 사람됨을 평가하지 않습니다.</p>'
           : '<p class="notice">정답은 없어요. 지금의 나와 가장 가까운 행동을 골라 주세요. 이 진단은 게임용 성향 표현이며 실제 능력·도덕성을 판정하지 않습니다.</p>') +
         '</div>';
     }
-    function go(n) { i = U.clamp(n, 0, qs.length - 1); opts.onCursor && opts.onCursor(i); render(); }
+    function go(n) {
+      if (adaptive && n >= list().length) opts.extend();    // 다음 질문이 아직 안 정해졌으면 지금까지의 답으로 고름
+      qs = list();
+      i = U.clamp(n, 0, qs.length - 1); opts.onCursor && opts.onCursor(i); render();
+    }
     root.onclick = e => {
       const c = e.target.closest('[data-ci]');
       if (c) {
@@ -187,15 +202,15 @@ BM.ui = (function () {
         opts.onAnswer && opts.onAnswer(q.id, opts.answers[q.id], i);
         root.querySelectorAll('[data-ci]').forEach(b => b.setAttribute('aria-pressed', b === c));
         c.classList.add('pressed');
-        setTimeout(() => { if (i < qs.length - 1) go(i + 1); else render(); }, 200);
+        setTimeout(() => { if (i < total - 1) go(i + 1); else render(); }, 200);
         return;
       }
       const n = e.target.closest('[data-nav]'); if (!n) return;
       if (n.dataset.nav === 'prev') go(i - 1);
       if (n.dataset.nav === 'next') go(i + 1);
-      if (n.dataset.nav === 'first-missing') go(qs.findIndex(x => !Number.isInteger(opts.answers[x.id])));
+      if (n.dataset.nav === 'first-missing') go(qs.findIndex(x => !answered(x)));
       if (n.dataset.nav === 'finish') {
-        if (!BM.scoring.isComplete(bank, opts.answers)) { go(qs.findIndex(x => !Number.isInteger(opts.answers[x.id]))); toast('모든 질문에 답해야 용사가 탄생해요.', true); return; }
+        if (!complete()) { const k = qs.findIndex(x => !answered(x)); if (k >= 0) go(k); toast('모든 질문에 답해야 용사가 탄생해요.', true); return; }
         opts.onDone();
       }
     };
@@ -236,7 +251,7 @@ BM.ui = (function () {
     let y = ay + ah + (legend ? 52 : 30);
     x.font = '700 24px ' + font;
     if (legend) {
-      const top = legend.ids.slice(0, 4), pct = BM.brooch.percents(BM.gem.ratios(legend.seed, top.length));
+      const top = legend.ids.slice(0, BM.CONFIG.gem.colorCount), pct = BM.brooch.percents(BM.gem.statRatios(legend.stats, top) || BM.gem.ratios(legend.seed, top.length));
       const line = '브로치 보석  ' + top.map((id, i) => BM.STAT[id].name + ' ' + pct[i] + '%').join(' · ');
       for (let fs = 24; fs >= 14; fs--) { x.font = '700 ' + fs + 'px ' + font; if (x.measureText(line).width <= W - 112) break; }
       x.fillStyle = '#ffffff'; x.fillText(line, W / 2, y); y += 36;

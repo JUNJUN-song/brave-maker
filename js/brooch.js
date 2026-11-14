@@ -1,7 +1,7 @@
 /* 브로치 보석 초상화 (확정 디자인 2026-11-13, docs/NOTES.md)
  * 용사 상반신 초상화의 망토 브로치에 상위 4개 능력치 색을 넣고, 브로치에서 부드러운 오라가 흘러나온다.
  *  - 색: 능력치 색 그대로의 보석 램프 (흰색=흰 보석, 검정=검은 보석, 회색=은빛, 유채색은 선명하게)
- *  - 섞기: 좌상단부터 대각선 띠 [2위, 1위, 3위, 4위], 띠 경계는 바둑판 디더. 비율 CONFIG.gem.ratios[4] (약 45·27·18·9%)
+ *  - 섞기: 위에서부터 띠 [4위(5%), 2위, 1위, 3위(15%)] (약 72° 기울기, 2026-11-15), 띠 경계는 바둑판 디더. 비율 CONFIG.gem.ratios[4] (50:35:15:5 → 약 48·33·14·5%)
  *  - 오라: 둘레 빛(최대 4px) + 짧은 빛줄기 3가닥(최대 14px) + 빛 알갱이 6개, 20프레임 × 120ms
  *  - 같은 사람(시드)·같은 능력치면 언제나 같은 그림 (새로고침해도 그대로)
  */
@@ -24,7 +24,7 @@ BM.brooch = (function () {
     return [f(h + 1 / 3), f(h), f(h - 1 / 3)].map(v => Math.round(v * 255));
   }
   const toward = (h, t, k) => h + ((((t - h) % 360) + 540) % 360 - 180) * k;
-  const rampCache = {};
+  const rampCache = {}, WHITE = new WeakSet();   // WHITE = 흰 보석(신성력) 램프
   // 능력치 색 → 보석 6단계 램프 (0 가장 어두움 … 5 반짝임, [r,g,b])
   //  가운데(3단계)는 능력치 색의 밝기 그대로 → 흰색은 흰 보석, 검정은 검은 보석, 분홍은 분홍 보석으로 보인다 (2026-11-13 사용자 요청)
   function jewelRamp(hex) {
@@ -35,14 +35,20 @@ BM.brooch = (function () {
     if (chroma < 0.12) {
       // 무채색: 색은 그대로 두고 밝기만 단계로 (원래 색의 옅은 기운만 유지)
       const S = Math.min(0.25, s), hh = chroma < 0.01 ? 225 : h;
-      const L = l > 0.85 ? [0.5, 0.64, 0.78, 0.9, 0.96, 0.99]                              // 흰 보석: 흰빛, 면은 연회색
-        : l < 0.3 ? [0.03, 0.06, 0.1, l, l + 0.1, l + 0.28]                               // 검은 보석: 검정, 반짝임만 회색
+      if (l > 0.85) {
+        // 흰 보석(신성력): 빛 면은 순백, 그림자 면은 옅은 샴페인 금빛 — 보석 탭(gem.ramp)과 같은 '신성한 흰색' (2026-11-15)
+        const HH = [40, 42, 44, 46, 48, 50], SS = [0.4, 0.36, 0.08, 0.05, 0.08, 0.15], LL = [0.68, 0.77, 0.88, 0.93, 0.965, 0.995];   // 금빛은 어두운 두 단계에만 (v1.7.7)
+        out = LL.map((li, i) => hslToRgb(HH[i], SS[i], li));
+        WHITE.add(out);
+        return (rampCache[hex] = out);
+      }
+      const L = l < 0.3 ? [0.03, 0.06, 0.1, l, l + 0.1, l + 0.28]                         // 검은 보석: 검정, 반짝임만 회색
         : [l * 0.35, l * 0.55, l * 0.78, l, l + (1 - l) * 0.5, l + (1 - l) * 0.85];        // 은빛 보석
       out = L.map((li, i) => hslToRgb(hh, S * (i >= 4 ? 0.7 : 1), li));
     } else {
       // 유채색: 능력치 색의 색상·밝기는 그대로, 채도는 낮게(최대 약 0.5) → 원색처럼 쨍하지 않은 원석 느낌 (2026-11-13 "보석 색상 너무 원색이 안들어가게")
       //  예전: 채도 72% 이상으로 올리고 그림자를 푸른/보라 쪽으로 크게 이동 → 초록이 형광, 분홍 그림자가 자홍이 됐음
-      const sat = Math.min(0.6, s) * 0.85, m = Math.min(0.72, Math.max(0.45, l));
+      const sat = Math.min(0.6, s) * 0.85, m = Math.min(0.75, Math.max(0.48, l + 0.03));   // 밝기는 능력치 색보다 아주 조금 밝게 (명세 10장 '조금 밝고')
       // 밝은 색(분홍·연보라)은 그림자를 덜 어둡고 덜 푸르게 → 진분홍·보라로 바뀌지 않고 제 색으로 보이게
       const k = Math.min(1, Math.max(0, (m - 0.57) / 0.15)), mix = (a, b) => a + (b - a) * k, sh = 1 - 0.5 * k;
       const L = [m * mix(0.28, 0.4), m * mix(0.49, 0.6), m * mix(0.74, 0.82), m, m + (1 - m) * 0.45, m + (1 - m) * 0.8];
@@ -85,8 +91,10 @@ BM.brooch = (function () {
     const ramps = colors.map(id => jewelRamp(BM.STAT[id].color));
     const inM = (x, y) => x >= 0 && y >= 0 && x < W && y < H && mask[y * W + x];
     const rnd = BM.util.rng(BM.util.hash(seed, 'jewel'));
-    const tilt = (rnd() - 0.5) * 0.6, ux = Math.cos(Math.PI / 4 + tilt), uy = Math.sin(Math.PI / 4 + tilt);
-    const order = [1, 0, 2, 3].filter(k => k < colors.length), share = order.map(k => ratios[k]);
+    // 4색(2026-11-15 사용자 요청): 위에서부터 4위(5%) · 2위 · 1위 · 3위(15%) — 띠를 약 72°로 세워 위·아래로 나뉘어 보이게 (대각선 느낌은 조금 남김)
+    // 그 밖의 색 수(예전 저장분): 좌상단부터 대각선 띠 2위·1위·3위·4위·5위
+    const four = colors.length === 4, tilt = (rnd() - 0.5) * (four ? 0.2 : 0.6), ang = (four ? Math.PI * 0.4 : Math.PI / 4) + tilt, ux = Math.cos(ang), uy = Math.sin(ang);
+    const order = four ? [3, 1, 0, 2] : [1, 0, 2, 3, 4].filter(k => k < colors.length), share = order.map(k => ratios[k]);
     const sorted = idx.map(i => ({ i, u: ((i % W) + 0.5 - cx) * ux + (((i / W) | 0) + 0.5 - cy) * uy })).sort((a, b) => a.u - b.u);
     const band = new Int8Array(W * H).fill(-1), cuts = []; let pos = 0;
     order.forEach((rk, bi) => {
@@ -97,7 +105,8 @@ BM.brooch = (function () {
     const colorOf = new Int8Array(W * H).fill(-1);
     sorted.forEach(({ i, u }) => {
       let rk = band[i];
-      for (let c = 0; c < cuts.length; c++) if (Math.abs(u - cuts[c]) < 0.9 * Math.max(1, W / BASE_W)) { const x = i % W, y = (i / W) | 0; rk = ((x + y) % 2 === 0) ? order[c] : order[c + 1]; break; }
+      // 4색의 맨 위 얇은 띠(4위 5%)와 2위 사이는 바둑판 디더를 하지 않음 (섞이면 5% 띠가 거의 안 보임)
+      for (let c = 0; c < cuts.length; c++) if (!(four && c === 0) && Math.abs(u - cuts[c]) < 0.9 * Math.max(1, W / BASE_W)) { const x = i % W, y = (i / W) | 0; rk = ((x + y) % 2 === 0) ? order[c] : order[c + 1]; break; }
       colorOf[i] = rk;
     });
     const rot = (rnd() * 8) | 0, facet = new Int8Array(W * H).fill(-2);
@@ -108,8 +117,10 @@ BM.brooch = (function () {
       if (Math.hypot(dx, dy) > 0.8) tone -= 0.5;
       const rN = x + 1 < W ? facet[i + 1] : -2, bN = y + 1 < H ? facet[i + W] : -2;
       if ((rN !== -2 && rN !== f) || (bN !== -2 && bN !== f)) tone -= 1;
-      let c = ramps[colorOf[i]][Math.max(0, Math.min(5, Math.round(tone)))];
-      if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => !inM(x + a, y + b))) { const lit = (Math.cos(Math.atan2(dy, dx) - LIGHT) + 1) / 2; c = ramps[colorOf[i]][lit > 0.62 ? 5 : lit > 0.3 ? 3 : 1]; }
+      let ti = Math.max(0, Math.min(5, Math.round(tone)));
+      if (ti === 1 && WHITE.has(ramps[colorOf[i]]) && (f + 8) % 3 === 0) ti = 2;   // 흰 보석: 금빛 그림자 면 일부를 흰빛으로 (v1.7.8)
+      let c = ramps[colorOf[i]][ti];
+      if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => !inM(x + a, y + b))) { const lit = (Math.cos(Math.atan2(dy, dx) - LIGHT) + 1) / 2; c = ramps[colorOf[i]][lit > 0.62 ? (four && colorOf[i] === 3 ? 4 : 5) : lit > 0.3 ? 3 : 1]; }   // 4위(5%) 테두리는 하얗게 날리지 않게
       d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2];
     });
     const put = (x, y, a) => { if (!inM(x, y)) return; const o = (y * W + x) * 4; for (let k = 0; k < 3; k++) d[o + k] = Math.round(d[o + k] + (255 - d[o + k]) * a); };
@@ -159,12 +170,12 @@ BM.brooch = (function () {
 
   // ---------- 조립 (캐시) ----------
   // spec: { look: 'girl'|'boy', colors: [id × 4], seed, sr, al }
-  function key(s) { return [s.look, s.colors.join(','), s.seed, Math.round((s.sr || 0) * 40), Math.round((s.al || 0) * 40)].join('|'); }
+  function key(s) { return [s.look, s.colors.join(','), s.seed, Math.round((s.sr || 0) * 40), Math.round((s.al || 0) * 40), (s.ratios || []).map(v => Math.round(v * 200)).join(',')].join('|'); }
   const cache = new Map();
   function build(spec) {
     const look = LOOKS.includes(spec.look) ? spec.look : 'girl', P = res[look]; if (!P) return null;
     const k = key(Object.assign({}, spec, { look })); if (cache.has(k)) return cache.get(k);
-    const colors = spec.colors.slice(0, 4), ratios = BM.gem.ratios(spec.seed, colors.length);
+    const colors = spec.colors.slice(0, BM.CONFIG.gem.colorCount), ratios = spec.ratios && spec.ratios.length === colors.length ? spec.ratios : BM.gem.ratios(spec.seed, colors.length);
     const base = document.createElement('canvas'); base.width = P.W; base.height = P.H; const bx = base.getContext('2d'); bx.drawImage(P.img, 0, 0);
     const im = bx.getImageData(0, 0, P.W, P.H); paint(im.data, P.W, P.H, P.mask, colors, ratios, spec.seed); bx.putImageData(im, 0, 0);
     const frames = [];
@@ -207,7 +218,7 @@ BM.brooch = (function () {
     else if (P0) { canvas.width = P0.W; canvas.height = P0.H; }     // 그림을 읽기 전에도 자리 크기를 맞춰 화면이 흔들리지 않게
     canvas.classList.add('px');
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', (opts.crop ? '브로치 보석' : (look === 'boy' ? '남자' : '여자') + ' 용사 초상화. 브로치 보석') + ' 색: ' + spec.colors.slice(0, 4).map(id => BM.STAT[id].name).join(', '));
+    canvas.setAttribute('aria-label', (opts.crop ? '브로치 보석' : (look === 'boy' ? '남자' : '여자') + ' 용사 초상화. 브로치 보석') + ' 색: ' + spec.colors.slice(0, BM.CONFIG.gem.colorCount).map(id => BM.STAT[id].name).join(', '));
     ready().then(() => { if (!alive) return; b = build(spec); last = -1; draw(0); });
     raf = requestAnimationFrame(loop);
     return { stop() { alive = false; cancelAnimationFrame(raf); }, get built() { return b; } };

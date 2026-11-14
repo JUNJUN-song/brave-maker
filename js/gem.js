@@ -38,12 +38,21 @@ BM.gem = (function () {
 
   // 6단계 램프 (0 어두움 → 5 가장 밝음). 어두운 쪽은 보랏빛으로, 밝은 쪽은 맑게 — 탁한 회색/갈색 방지
   const rampCache = {};
+  const WHITE_RAMPS = new WeakSet();   // 흰 보석(신성력) 램프: 가장 어두운 단계(금빛)를 일부 면에서 흰빛으로
   function ramp(hex) {
     if (rampCache[hex]) return rampCache[hex];
     let [h, s, l] = rgbToHsl(...hexToRgb(hex));
     let L, S, H;
-    if (l > 0.88) {            // 흰색 계열(신성력): 은백·연푸른 투명감
-      H = [228, 224, 220, 216, 212, 210]; S = [0.42, 0.45, 0.5, 0.6, 0.75, 1]; L = [0.42, 0.56, 0.7, 0.8, 0.9, 0.98];
+    if (l > 0.88) {            // 흰색 계열(신성력): 신성한 흰 보석 — 빛 면은 순백, 그림자 면은 옅은 샴페인 금빛 (2026-11-15 사용자: "회청이 안 예뻐, 약간 금색을 섞어 신성한 느낌")
+      //  금빛은 그림자에만 옅게(지도력의 진한 금색과 헷갈리지 않게 밝기 높게·채도 낮게), 가장 밝은 두 단계는 거의 흰빛
+      //  예전: 하늘색(채도 0.42~1) → 흰·연회색 덩어리(v1.7.3) → 얼음빛 회청 다이아몬드(v1.7.4)
+      // v1.7.7 (사용자: "진하기를 줄이면 안 되고, 흰 부분이 더 많게"): 금빛은 v1.7.5 진하기 그대로 가장 어두운 한 단계에만(신성력 칸의 약 30%), 나머지는 흰빛
+      //  (보석 탭은 빛 반대쪽 면을 가장 어두운 단계로 많이 칠해서, 두 단계를 금빛으로 하면 약 45~50% 가 금빛)
+      H = [40, 44, 46, 46, 48, 50]; S = [0.4, 0.1, 0.07, 0.05, 0.08, 0.15]; L = [0.73, 0.84, 0.895, 0.935, 0.97, 0.995];
+      //  v1.7.8 ("조금만 더 줄이고"): 그림자 면 둘 중 하나는 금빛 대신 흰빛(build 에서 WHITE_RAMPS 로 판단) → 금빛 칸 약 37% → 약 23%
+      rampCache[hex] = H.map((hh, i) => hslToHex(hh, S[i], L[i]));
+      WHITE_RAMPS.add(rampCache[hex]);
+      return rampCache[hex];
     } else if (l < 0.25) {     // 검정 계열(자존감): 흑요석 + 라벤더 광택
       H = [250, 250, 252, 255, 258, 262]; S = [0.3, 0.28, 0.26, 0.26, 0.3, 0.45]; L = [0.07, 0.12, 0.19, 0.28, 0.42, 0.66];
     } else if (s < 0.3) {      // 회색 계열(절제력): 강철빛 푸른 은색
@@ -54,7 +63,7 @@ BM.gem = (function () {
       const c = Math.min(0.6, s) * 0.85;
       H = [toward(255, 0.14), toward(255, 0.08), toward(255, 0.03), h, toward(55, 0.05), toward(55, 0.08)];
       S = [c * 0.85, c * 0.95, c, c, c * 0.85, c * 0.55];
-      L = [l - 0.33, l - 0.22, l - 0.1, l + 0.03, l + 0.15, 0.92].map(v => U.clamp(v, 0.1, 0.95));
+      L = [l - 0.3, l - 0.19, l - 0.07, l + 0.06, l + 0.18, 0.93].map(v => U.clamp(v, 0.1, 0.95));   // 조금 밝게 (명세 10장)
     }
     rampCache[hex] = H.map((hh, i) => hslToHex(hh, S[i], L[i]));
     return rampCache[hex];
@@ -141,10 +150,18 @@ BM.gem = (function () {
     }
     return g.base.slice();
   }
-  function layout(seed, nColors) {
+  // 보석 색 비율 = 상위 N개 능력치의 공정 정규화 점수(희귀 ÷10, 일반 ÷기준치 — scoring.normalized) 비율 (명세 10장, 2026-11-13)
+  // 점수를 모르는 화면(데모 등)은 null → 예전처럼 시드 고정 비율
+  function statRatios(stats, ids) {
+    if (ids && ids.length && BM.CONFIG.gem.fixedRatios && BM.CONFIG.gem.ratios[ids.length]) return BM.CONFIG.gem.ratios[ids.length].base.slice();   // 고정 비율 (60·25·10·5)
+    if (!stats || !ids || !ids.length || !BM.scoring) return null;
+    const norm = BM.scoring.normalized(stats).norm, v = ids.map(id => Math.max(0, norm[id] || 0)), s = v.reduce((a, b) => a + b, 0);
+    return s > 0 ? v.map(x => x / s) : ids.map(() => 1 / ids.length);
+  }
+  function layout(seed, nColors, given) {
     const N = nColors || BM.CONFIG.gem.colorCount;
     const rnd = U.rng(U.hash(seed, 'layout'));
-    const p = ratios(seed, N);
+    const p = given && given.length === N ? given : ratios(seed, N);
     const outer = FACETS.filter(f => f.ring > 0);          // 32면: 정확한 비율로 배분
     const n = outer.length;
     const exact = p.map(v => v * n); const cnt = exact.map(Math.floor);
@@ -172,7 +189,9 @@ BM.gem = (function () {
         if (r === N - 1) {
           const edges = [0].concat(cuts, [n]);
           const s = p.map((_, i) => (pre[edges[i + 1]] - pre[edges[i]] + (i === 0 ? tableA : 0)) / totalA);
-          const bad = s.some((v, i) => i > 0 && v >= s[i - 1]) ? 1 : 0, err = Math.max(...s.map((v, i) => Math.abs(v - p[i])));
+          // 피할 것: 순위 뒤바뀜, 그리고 목표가 1.5배 이상 차이 나는 이웃 순위(10%·5% 등)가 1.4배 미만으로 비슷해지는 것 (2026-11-15, 60·25·10·5)
+          const bad = s.some((v, i) => i > 0 && v >= s[i - 1]) ? 1 : 0, close = s.some((v, i) => i > 0 && p[i - 1] >= 1.5 * p[i] && s[i - 1] < 1.4 * v) ? 1 : 0;
+          const err = Math.max(...s.map((v, i) => Math.abs(v - p[i]))) + close;
           if (bad < best.bad || (bad === best.bad && err < best.err)) { best.bad = bad; best.err = err; best.cuts = cuts.slice(); }
           return;
         }
@@ -245,6 +264,7 @@ BM.gem = (function () {
       if (pct && lay.rank[id] === -1) tone += 0.5;   // 테이블 별: 1위 색의 조금 밝은 단계 (하얗게 날아가지 않게)
       // 디더는 계조 경계에서만 아주 약하게 (과도한 노이즈 금지)
       let t = U.clamp(Math.floor(tone + 0.5 + (bayer(x, y) - 0.5) * 0.45), 0, 5);
+      if (t === 0 && id % 2 === 0 && WHITE_RAMPS.has(rp)) t = 1;   // 흰 보석: 그림자 면 둘 중 하나는 금빛 대신 흰빛 (v1.7.8)
       let col = rp[t];
       // 반사광: 면의 절반에 다른 색의 맑은 반사 (면 단위 → 노이즈 없이 투명감)
       if (lay.reflect[id]) {
@@ -381,7 +401,7 @@ BM.gem = (function () {
   // ---------- 조립 ----------
   function build(spec) {
     const nF = BM.CONFIG.gem.frames;
-    const lay = layout(spec.seed, spec.colors.length);
+    const lay = layout(spec.seed, spec.colors.length, spec.ratios);
     const body = drawBody(spec, lay);
     const tint = body.ramps[0][4];
     const frames = [];
@@ -399,7 +419,7 @@ BM.gem = (function () {
   }
 
   function specKey(s) {
-    return [s.seed, s.colors.join(','), Math.round((s.sr || 0) * 50), Math.round((s.al || 0) * 50), Math.round((s.esteem || 0))].join('|');
+    return [s.seed, s.colors.join(','), Math.round((s.sr || 0) * 50), Math.round((s.al || 0) * 50), Math.round((s.esteem || 0)), (s.ratios || []).map(v => Math.round(v * 200)).join(',')].join('|');
   }
   const buildCache = new Map();
   function cached(spec) {
@@ -522,5 +542,5 @@ BM.gem = (function () {
     return cv;
   }
 
-  return { SIZE, RADIUS: R, CX, CY, ramp, mix, luminance, build, cached, Player, layout, ratios, facetOf, inside, decompose, stageOf, STAGE_NAME, rareStage, icon, prefersReduced };
+  return { SIZE, RADIUS: R, CX, CY, ramp, mix, luminance, build, cached, Player, layout, ratios, statRatios, facetOf, inside, decompose, stageOf, STAGE_NAME, rareStage, icon, prefersReduced };
 })();

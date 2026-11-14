@@ -209,6 +209,37 @@ label.lbl { display: block; margin: 12px 0 4px; color: var(--muted); font-size: 
   box-shadow: 0 -2px 0 0 var(--line), 0 2px 0 0 var(--line), -2px 0 0 0 var(--line), 2px 0 0 0 var(--line); }
 .icon-px { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; }
 
+/* ---------- 상단 모험 장면 (수련 탭 맨 위) ---------- */
+/* 캔버스는 논리 해상도(높이 144) × 기기 픽셀 정수 배율 (scene.js 가 폭·높이를 맞춤), 도트가 흐려지지 않게 pixelated */
+.scene-wrap { margin: 8px 4px 4px; }
+.scene-wrap canvas { display: block; margin: 0 auto; image-rendering: pixelated; image-rendering: crisp-edges;
+  box-shadow: 0 -4px 0 0 var(--line), 0 4px 0 0 var(--line), -4px 0 0 0 var(--line), 4px 0 0 0 var(--line); }
+.scene-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 30px; margin-top: 8px; padding: 0 2px; }
+.scene-bar .btn.sm { flex: none; }
+
+/* ---------- 메인: 오늘 수련 한눈에 ---------- */
+.today-glance .bar { margin: 4px 0 12px; }
+.glance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.g-item { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 10px 6px 6px; border: 0; cursor: pointer; text-align: left;
+  font: inherit; font-size: 14px; color: var(--muted); background: #1c1749; min-width: 0;
+  box-shadow: 0 -3px 0 0 var(--line), 0 3px 0 0 var(--line), -3px 0 0 0 var(--line), 3px 0 0 0 var(--line), inset 0 3px 0 0 #2c2668; }
+.g-item:active { transform: translateY(1px); }
+.g-item .g-mark { flex: none; width: 24px; height: 24px; display: grid; place-items: center; font-weight: 700; font-size: 14px; line-height: 1; color: #fff;
+  background: #2e2862; box-shadow: inset 0 0 0 2px #4a4290; }
+.g-item .g-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-item.ok, .g-item.try, .g-item.rest, .g-item.miss { color: #fff; }
+.g-item.ok .g-mark { background: var(--ok); box-shadow: inset 0 -3px 0 0 rgba(0,0,0,.25); }
+.g-item.try .g-mark { background: var(--try); box-shadow: inset 0 -3px 0 0 rgba(0,0,0,.25); }
+.g-item.rest .g-mark { background: var(--rest); box-shadow: inset 0 -3px 0 0 rgba(0,0,0,.25); }
+.g-item.miss .g-mark { background: var(--miss); box-shadow: inset 0 -3px 0 0 rgba(0,0,0,.25); }
+.g-foot { margin-top: 12px; gap: 8px; }
+@media (max-width: 340px) { .glance { grid-template-columns: 1fr; } }
+/* 수련 탭 맨 아래 '지난 기록' 접기 */
+details.fold { margin-top: 4px; }
+details.fold > summary { list-style: none; }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold[open] > summary { margin-bottom: 18px; }
+
 /* ---------- 용사 초상화 + 브로치 보석 ---------- */
 .hero-card { position: relative; width: fit-content; margin: 12px auto 8px; padding: 4px; line-height: 0;
   background: linear-gradient(#231d5a, #120f33);
