@@ -77,7 +77,7 @@
       '<div class="screen">' +
       '<div class="hero-pair">' + UI.heroCard('demo-girl') + UI.heroCard('demo-boy') + '</div>' +
       '<div class="title-logo"><div class="ko">용사 키우기</div><div class="en">BRAVE MAKER</div></div>' +
-      '<p class="center muted" style="margin:14px 8px 18px">현실의 나를, 내가 원하는 용사로.<br>나의 선택과 행동이 가슴의 보석이 됩니다.</p>' +
+      '<p class="center muted" style="margin:14px 8px 18px">현실의 나를, 내가 원하는 용사로.<br>나의 선택과 행동이 가슴의 보석이 돼요.</p>' +
       '<button class="btn gold block" data-a="new">★ 용사 탄생 시작</button>' +
       (saved ? '<button class="btn block" data-a="continue">이어하기 · 용사 ' + U.esc(saved.profile.name || '') + '</button>' : '') +
       '<button class="btn ghost block" data-a="import">백업 파일 불러오기</button>' +
@@ -85,15 +85,15 @@
       (!standalone && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
         ? '<div class="notice"><b class="gold">휴대폰 앱으로 쓰기</b><br>' +
           (/Android/i.test(navigator.userAgent) ? 'Chrome 메뉴(⋮) → <b>홈 화면에 추가</b> 또는 <b>앱 설치</b>' : 'Safari 아래 공유 버튼(□↑) → <b>홈 화면에 추가</b>') +
-          '<br>추가한 아이콘으로 앱을 열고 그 안에서 시작하세요. 브라우저에서 한 기록은 홈 화면 앱으로 넘어가지 않아요 (넘기려면 설정 → 백업).</div>'
+          '<br>추가한 아이콘으로 앱을 열고 그 안에서 시작해 주세요. 브라우저에서 한 기록은 홈 화면 앱으로 넘어가지 않아요 (넘기려면 설정 → 백업).</div>'
         : '') +
-      '<p class="notice center">모든 기록은 이 기기에만 저장됩니다. 서버로 보내지 않아요.</p>' +
+      '<p class="notice center">모든 기록은 이 기기에만 저장돼요. 서버로 보내지 않아요.</p>' +
       '</div>';
     mountDemos();
     app.onclick = async e => {
       const a = e.target.closest('[data-a]'); if (!a) return;
       if (a.dataset.a === 'new') {
-        if (saved && !(await UI.confirmBox('새 용사로 시작할까요?', '지금 기기에 저장된 <b>용사 ' + U.esc(saved.profile.name) + '</b>의 기록이 지워져요. 필요하면 먼저 설정에서 백업하세요.', '새로 시작', true))) return;
+        if (saved && !(await UI.confirmBox('새 용사로 시작할까요?', '지금 기기에 저장된 <b>용사 ' + U.esc(saved.profile.name) + '</b>의 기록이 지워져요. 필요하면 먼저 설정에서 백업해 주세요.', '새로 시작', true))) return;
         ST.clear(); S = { phase: 'name' }; render();
       }
       if (a.dataset.a === 'continue') { S = saved; render(); }
@@ -113,7 +113,7 @@
       '<p class="small muted" style="margin:6px 0 0">망토의 브로치 보석이 나의 능력치 색으로 빛나요. 모습은 나중에 설정에서 바꿀 수 있어요.</p></div>' +
       '<div class="panel" style="margin-top:20px"><span class="tl">이름</span>' +
       '<h2>용사의 이름을 정해 주세요</h2>' +
-      '<p class="small muted">실명이 아니어도 괜찮아요. 내가 되고 싶은 용사의 이름이면 됩니다.</p>' +
+      '<p class="small muted">실명이 아니어도 괜찮아요. 내가 되고 싶은 용사의 이름이면 돼요.</p>' +
       '<label class="lbl" for="nm">용사 이름 (최대 12자)</label>' +
       '<input id="nm" class="field" maxlength="12" autocomplete="off" placeholder="예: 송준철">' +
       '<p class="center" style="margin:14px 0 0">용사 <b class="gold" id="pv">___</b></p>' +
@@ -162,7 +162,7 @@
     app.innerHTML = '<div class="screen loading">' + UI.heroCard('wait', 'sm') + '<h2>답변을 교차 분석하는 중</h2><div class="dots"><span></span><span></span><span></span></div><p class="small muted" style="margin-top:16px">200 포인트를 나누고 브로치 보석을 깎고 있어요…</p></div>';
     brooch(app.querySelector('canvas[data-brooch]'), UI.broochSpec(look(), S.profile.seed, ['discipline', 'divine', 'esteem', 'mind'], { sr: 0.3, al: 0.3 }));
     const result = Array.isArray(S.diagnosis.order) ? BM.adaptive.compute(BM.QUESTION_BANK, S.diagnosis.order, S.diagnosis.answers) : BM.scoring.compute(BM.QUESTION_BANK, S.diagnosis.answers);
-    if (!result) { UI.toast('모든 질문에 답해야 해요.', true); S.phase = 'quiz'; return render(); }
+    if (!result) { UI.toast('모든 질문에 답해 주세요.', true); S.phase = 'quiz'; return render(); }
     S.diagnosis.result = result;
     S.diagnosis.completedAt = new Date().toISOString();
     S.profile.startDate = U.today();
@@ -184,8 +184,8 @@
       '<div class="panel"><span class="tl">초기 능력치</span><span class="tr count">200 / 200</span>' + UI.statRows(r.points) + '</div>' +
       '<div class="panel dark"><span class="tl">두드러진 성향</span>' +
       '<p>' + r.top3.map(id => '<b style="color:' + (id === 'esteem' ? '#b9b6d6' : BM.STAT[id].color) + '">' + BM.STAT[id].name + '</b>(' + BM.STAT[id].desc + ')').join(', ') + ' 쪽의 행동이 답변에서 자주 보였어요.</p>' +
-      '<p class="small muted">이 점수는 시작점이에요. 앞으로의 실제 행동에 따라 브로치 보석의 색과 오오라가 계속 바뀝니다. 브로치에는 상위 4개 능력치 색이 들어가요.</p></div>' +
-      '<p class="notice">게임용 성향 진단이며 실제 능력·인격·도덕성을 평가하지 않습니다. 일반 능력치는 처음에 최대 60, 희귀 능력치(★)는 최대 10이에요.</p>' +
+      '<p class="small muted">이 점수는 시작점이에요. 앞으로의 실제 행동에 따라 브로치 보석의 색과 오오라가 계속 바뀌어요. 브로치에는 상위 ' + BM.CONFIG.gem.colorCount + '개 능력치 색이 들어가요.</p></div>' +
+      '<p class="notice">게임용 성향 진단이며 실제 능력·인격·도덕성을 평가하지 않아요. 일반 능력치는 처음에 최대 60, 희귀 능력치(★)는 최대 10이에요.</p>' +
       '<button class="btn ghost block" data-a="png">결과 이미지 저장</button>' +
       '<button class="btn gold block" data-a="next">일일 수련 정하기 ▶</button>' +
       '</div>';
@@ -206,7 +206,7 @@
     app.innerHTML =
       '<div class="screen">' +
       '<h2 style="margin:8px 4px">나의 일일 수련</h2>' +
-      '<p class="small muted" style="margin:0 4px 8px">하고 싶은 수련을 고르세요. 이름·기준·요일은 나중에 설정에서 바꿀 수 있어요. <span class="opp">기회형</span>은 기회가 있던 날만 기록하고, 기회가 없으면 감점하지 않아요.</p>' +
+      '<p class="small muted" style="margin:0 4px 8px">하고 싶은 수련을 골라 주세요. 이름·기준·요일은 나중에 설정에서 바꿀 수 있어요. <span class="opp">기회형</span>은 기회가 있던 날만 기록하고, 기회가 없으면 감점하지 않아요.</p>' +
       G.DEFAULT_TASKS.map((t, i) =>
         '<button class="btn choice" data-pick="' + i + '" aria-pressed="' + S._picks[i] + '"><span class="key">' + (S._picks[i] ? '■' : '□') + '</span><span class="grow"><b>' + t.name + '</b>' +
         (t.stats.some(s => top.includes(s)) ? ' <span class="streak">추천</span>' : '') + (t.opportunity ? ' <span class="opp">기회형</span>' : '') +
@@ -412,7 +412,7 @@
       '<div class="grow center"><div class="small muted">지금</div><div class="gem-stage" style="margin:0"><canvas data-gem="now" style="width:120px"></canvas></div>' + names(R.top3) + '</div></div>' +
       UI.auraLines(R.aura) + '<p class="small dim" style="margin:6px 0 0">오오라는 오래 쌓인 기록 70% + 최근 14일 30%로 천천히 변해요.</p></div>' +
       '<div class="panel"><span class="tl">능력치 보석</span><span class="tr count">' + U.fmt(R.xp) + ' XP</span>' + UI.statRows(R.stats) + '</div>' +
-      '<p class="notice">100마다 완성 보석 1개, 완성 보석 10개는 대형 보석 1개(1,000)로 합성돼요. 10,000·100,000도 10개씩 합쳐집니다. 초기값: ' +
+      '<p class="notice">100마다 완성 보석 1개, 완성 보석 10개는 대형 보석 1개(1,000)로 합성돼요. 10,000·100,000도 10개씩 합쳐져요. 초기값: ' +
       BM.STAT_IDS.map(id => BM.STAT[id].name + ' ' + ri.points[id]).join(' · ') + '</p>';
   }
 
@@ -457,7 +457,7 @@
       '<label class="lbl" for="rn">이름 변경</label><div class="row"><input id="rn" class="field grow" maxlength="12" value="' + U.esc(S.profile.name) + '"><button class="btn sm" data-a="rename">변경</button></div>' +
       '<label class="lbl">모습</label><div class="toggle-grid">' + ['girl', 'boy'].map(k => '<button class="btn" data-look="' + k + '" aria-pressed="' + (look() === k) + '">' + UI.LOOK_NAME[k] + '</button>').join('') + '</div>' +
       '<p class="small dim">시작일 ' + S.profile.startDate + ' · 하루 기준 새벽 ' + BM.CONFIG.dayStartHour + '시</p></div>' +
-      '<div class="panel"><span class="tl">내 수련</span>' +
+      '<div class="panel"><span class="tl">나의 수련</span>' +
       S.tasks.map(t => '<div class="spread stat-row"><span class="grow"><b>' + U.esc(t.name) + '</b>' + (t.archived ? ' <span class="dim small">보관됨</span>' : '') + '<br><span class="small muted">' + daysLabel(t) + ' · ' + t.stats.map(s => BM.STAT[s].name).join('·') + ' · ' + G.GROWTH_NAME[G.growthOf(null, t)] + '</span></span>' +
         '<button class="btn sm ghost" data-edit="' + t.id + '">편집</button><button class="btn sm ghost" data-arch="' + t.id + '">' + (t.archived ? '복원' : '보관') + '</button></div>').join('') +
       '<button class="btn ghost block" data-a="add">+ 수련 추가</button>' +
@@ -471,7 +471,7 @@
       '<input type="file" id="imp" accept="application/json,.json" class="sr-only" aria-label="백업 파일 선택">' +
       '<button class="btn danger block" data-a="reset">새 용사로 다시 시작</button>' +
       '<p class="small dim">저장 위치: 이 브라우저의 로컬 저장소 · 마지막 저장 ' + (S.savedAt ? new Date(S.savedAt).toLocaleString('ko-KR') : '-') + '</p></div>' +
-      '<p class="notice">BRAVE MAKER는 자기 성장을 돕는 게임이에요. 점수는 앱 안의 습관 추세를 보여주는 게임 지표이고, 실제 능력·외모·인격·도덕성의 평가가 아닙니다.</p>';
+      '<p class="notice">BRAVE MAKER는 자기 성장을 돕는 게임이에요. 점수는 앱 안의 습관 추세를 보여주는 게임 지표이고, 실제 능력·외모·인격·도덕성의 평가가 아니에요.</p>';
   }
 
   async function onHomeClick(e, R) {
@@ -519,7 +519,7 @@
       case 'import': return document.getElementById('imp').click();
       case 'reset': {
         if (!(await UI.confirmBox('정말 다시 시작할까요?', '용사 <b>' + U.esc(S.profile.name) + '</b>의 진단 결과와 모든 수련 기록이 이 기기에서 지워져요.', '다음', true))) return;
-        if (!(await UI.confirmBox('마지막 확인', '되돌릴 수 없어요. 백업을 내보내지 않았다면 취소하고 먼저 백업하세요.', '모두 지우고 새로 시작', true))) return;
+        if (!(await UI.confirmBox('마지막 확인', '되돌릴 수 없어요. 백업을 내보내지 않았다면 취소하고 먼저 백업해 주세요.', '모두 지우고 새로 시작', true))) return;
         ST.clear(); S = null; view = { tab: 'main', date: null }; lastSnapshot = null; return render();
       }
     }
@@ -549,7 +549,7 @@
     try { saved = ST.load(); } catch (e) { UI.toast('저장 데이터를 읽지 못했어요: ' + e.message, true); }
     if (BM.cloud.present()) {
       // claude.ai 링크: 내 계정에 저장된 기록을 먼저 불러온다
-      app.innerHTML = '<div class="screen loading"><div class="title-logo"><div class="ko">용사 키우기</div></div><h2 style="margin-top:20px">내 기록 불러오는 중</h2><div class="dots"><span></span><span></span><span></span></div></div>';
+      app.innerHTML = '<div class="screen loading"><div class="title-logo"><div class="ko">용사 키우기</div></div><h2 style="margin-top:20px">나의 기록을 불러오는 중</h2><div class="dots"><span></span><span></span><span></span></div></div>';
       if (await BM.cloud.init()) {
         BM.cloud.onError = e => UI.toast('계정에 저장하지 못했어요 (' + ((e && e.code) || '오류') + '). 잠시 후 다시 시도돼요.', true);
         try {

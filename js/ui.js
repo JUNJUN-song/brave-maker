@@ -108,8 +108,8 @@ BM.ui = (function () {
 
   function level3(v) { return v >= 0.66 ? '선명함' : v >= 0.4 ? '잔잔함' : '은은함'; }
   function auraLines(a) {
-    return '<div class="small">자기존중 오오라 <b class="gold">' + level3(a.sr) + '</b> · 분홍빛이 보석 가까이 모입니다</div>' +
-      '<div class="small">이타 실천 오오라 <b class="gold">' + level3(a.al) + '</b> · 흰빛이 바깥으로 퍼집니다</div>';
+    return '<div class="small">자기존중 오오라 <b class="gold">' + level3(a.sr) + '</b> · 분홍빛이 보석 가까이 모여요</div>' +
+      '<div class="small">이타 실천 오오라 <b class="gold">' + level3(a.al) + '</b> · 흰빛이 바깥으로 퍼져요</div>';
   }
 
   // ---------- 능력치 목록 (가로 보석 + 오른쪽 숫자) ----------
@@ -185,8 +185,8 @@ BM.ui = (function () {
         (last && !complete() && qs.some(x => !answered(x)) ? '<p class="small muted center">아직 답하지 않은 질문이 ' + qs.filter(x => !answered(x)).length + '개 있어요. <button class="btn sm ghost" data-nav="first-missing">이동</button></p>' : '') +
         (adaptive && i === 0 ? '<p class="small muted center" style="margin:6px 0 0">답에 따라 다음 질문이 골라져요 (모두 ' + total + '문항).</p>' : '') +
         (q.stage === 'baseline'
-          ? '<p class="notice">최근에 실제로 한 만큼 골라 주세요. 하고 싶은 만큼이 아니라 해 온 만큼이에요. 생활 습관의 자기보고일 뿐, 능력이나 사람됨을 평가하지 않습니다.</p>'
-          : '<p class="notice">정답은 없어요. 지금의 나와 가장 가까운 행동을 골라 주세요. 이 진단은 게임용 성향 표현이며 실제 능력·도덕성을 판정하지 않습니다.</p>') +
+          ? '<p class="notice">최근에 실제로 한 만큼 골라 주세요. 하고 싶은 만큼이 아니라 해 온 만큼이에요. 생활 습관의 자기보고일 뿐, 능력이나 사람됨을 평가하지 않아요.</p>'
+          : '<p class="notice">정답은 없어요. 지금의 나와 가장 가까운 행동을 골라 주세요. 이 진단은 게임용 성향 표현이며 실제 능력·도덕성을 판정하지 않아요.</p>') +
         '</div>';
     }
     function go(n) {
@@ -270,7 +270,7 @@ BM.ui = (function () {
       x.fillStyle = 'rgba(255,255,255,0.3)'; x.fillRect(bx + 2, by + 32, Math.round(268 * v / cap), 3);
     });
     x.textAlign = 'center'; x.fillStyle = '#6d66a3'; x.font = '18px ' + font;
-    x.fillText('게임용 성향 진단이며 실제 능력·인격·도덕성의 평가가 아닙니다.', W / 2, H - 64);
+    x.fillText('게임용 성향 진단이며 실제 능력·인격·도덕성의 평가가 아니에요.', W / 2, H - 64);
     return c;
   }
   function savePNG(canvas, filename) {
@@ -285,7 +285,7 @@ BM.ui = (function () {
           setTimeout(() => URL.revokeObjectURL(url), 5000);
         }
         // iOS 등에서 다운로드가 막혀도 길게 눌러 저장할 수 있게 미리보기 제공
-        modal('<h2>결과 이미지</h2><p class="small muted">저장이 안 되면 이미지를 길게 눌러 사진에 저장하세요.</p><img class="px" alt="진단 결과 이미지" style="width:100%;height:auto" src="' + canvas.toDataURL('image/png') + '"><button class="btn block" data-x="close">닫기</button>',
+        modal('<h2>결과 이미지</h2><p class="small muted">저장이 안 되면 이미지를 길게 눌러 사진에 저장해 주세요.</p><img class="px" alt="진단 결과 이미지" style="width:100%;height:auto" src="' + canvas.toDataURL('image/png') + '"><button class="btn block" data-x="close">닫기</button>',
           (m, close) => m.addEventListener('click', e => { if (e.target.closest('[data-x]')) close(); }));
         res(!!blob);
       };

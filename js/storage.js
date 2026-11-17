@@ -40,10 +40,10 @@ BM.storage = (function () {
     try { localStorage.removeItem(KEY); } catch (e) { lastError = e; }
   }
   function validate(s) {
-    if (!s || typeof s !== 'object') throw new Error('저장 데이터 형식이 아닙니다.');
-    if (s.app !== 'BRAVE_MAKER') throw new Error('BRAVE MAKER 백업 파일이 아닙니다.');
-    if (!s.profile || typeof s.profile.name !== 'string' || !Number.isFinite(s.profile.seed)) throw new Error('용사 정보가 없습니다.');
-    if (!s.diagnosis || typeof s.diagnosis.answers !== 'object') throw new Error('진단 정보가 없습니다.');
+    if (!s || typeof s !== 'object') throw new Error('저장 데이터 형식이 아니에요.');
+    if (s.app !== 'BRAVE_MAKER') throw new Error('BRAVE MAKER 백업 파일이 아니에요.');
+    if (!s.profile || typeof s.profile.name !== 'string' || !Number.isFinite(s.profile.seed)) throw new Error('용사 정보가 없어요.');
+    if (!s.diagnosis || typeof s.diagnosis.answers !== 'object') throw new Error('진단 정보가 없어요.');
     s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
     s.records = s.records && typeof s.records === 'object' ? s.records : {};
     s.settings = s.settings || { reducedMotion: 'auto' };
@@ -61,7 +61,7 @@ BM.storage = (function () {
     }));
     if (s.diagnosis.result) {
       const sum = BM.STAT_IDS.reduce((a, id) => a + (s.diagnosis.result.points[id] || 0), 0);
-      if (sum !== BM.CONFIG.totalPoints) throw new Error('초기 포인트 합계가 200이 아닙니다.');
+      if (sum !== BM.CONFIG.totalPoints) throw new Error('초기 포인트 합계가 200이 아니에요.');
     }
     return s;
   }

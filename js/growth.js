@@ -16,7 +16,7 @@ BM.growth = (function () {
   const DEFAULT_TASKS = [
     { key: 'exercise', name: '운동', criterion: '정한 운동 계획을 안전하게 수행', stats: ['fit'], days: [1, 3, 5], exercise: true, growth: 'habit', on: true },
     { key: 'diet', name: '식단', criterion: '극단적 제한 없이 계획한 식사', stats: ['recovery', 'discipline'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'habit', on: false },
-    { key: 'create', name: '창작', criterion: '음악·게임 등 작업 30분', stats: ['create'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'habit', on: true },
+    { key: 'create', name: '창작', criterion: '창작·제작 작업 30분', stats: ['create'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'habit', on: true },
     { key: 'study', name: '학습', criterion: '개발·언어·독서 20분', stats: ['mind'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'habit', on: true },
     { key: 'shower', name: '샤워', criterion: '필요한 일상 위생', stats: ['charm'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'instant', on: true },
     { key: 'skin', name: '피부관리', criterion: '나에게 맞는 간단 루틴', stats: ['charm'], days: [0, 1, 2, 3, 4, 5, 6], growth: 'instant', on: false },

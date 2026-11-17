@@ -23,12 +23,12 @@
     app.innerHTML =
       '<div class="screen">' +
       '<div class="title-logo"><div class="ko">용사 키우기</div><div class="en">성향 진단</div></div>' +
-      '<p class="center muted" style="margin:12px 8px">' + BM.adaptive.TOTAL + '가지 질문으로 요즘의 내 습관과 선택을 살펴봐요 (답에 따라 다음 질문이 달라져요).<br>답변으로 용사 망토의 브로치 보석 색이 정해져요.</p>' +
+      '<p class="center muted" style="margin:12px 8px">' + BM.adaptive.TOTAL + '가지 질문으로 요즘 나의 습관과 선택을 살펴봐요 (답에 따라 다음 질문이 달라져요).<br>답변으로 용사 망토의 브로치 보석 색이 정해져요.</p>' +
       '<div class="panel"><span class="tl">모습</span>' + UI.lookPicker(null) + '</div>' +
       '<div class="panel"><span class="tl">이름</span><label class="lbl" for="nm">용사 이름 (최대 12자)</label><input id="nm" class="field" maxlength="12" autocomplete="off" placeholder="예: 송준철"></div>' +
       '<p class="center small gold" id="hint" aria-live="polite" style="margin:4px 0 0">모습을 골라 주세요</p>' +
       '<button class="btn gold block" id="go" disabled>진단 시작 ▶</button>' +
-      '<p class="notice">답변은 이 화면을 닫으면 사라지고 어디에도 전송되지 않아요. 게임용 성향 진단이며 실제 능력·인격·도덕성을 평가하지 않습니다.</p>' +
+      '<p class="notice">답변은 이 화면을 닫으면 사라지고 어디에도 전송되지 않아요. 게임용 성향 진단이며 실제 능력·인격·도덕성을 평가하지 않아요.</p>' +
       '</div>';
     app.querySelectorAll('canvas[data-brooch^="demo-"]').forEach(c => brooch(c, UI.DEMO[c.dataset.brooch.slice(5)]));
     let pick = null;
@@ -76,10 +76,10 @@
       UI.broochLegend(r.top3, S.seed, { stats: r.points }) +
       '<div class="panel"><span class="tl">성향 오오라</span>' + UI.auraLines(r.axes) + '</div>' +
       '<div class="panel"><span class="tl">초기 능력치</span><span class="tr count">200 / 200</span>' + UI.statRows(r.points) + '</div>' +
-      '<p class="notice">일반 능력치는 최대 60, 희귀 능력치(★)는 최대 10에서 시작해요. 브로치에는 상위 5개 능력치 색이 들어가요. 정식 앱에서는 매일의 수련으로 브로치 보석의 색과 오오라가 계속 바뀝니다.</p>' +
-      '<button class="btn gold block" data-a="png">결과 이미지 저장 (PNG)</button>' +
+      '<p class="notice">일반 능력치는 최대 60, 희귀 능력치(★)는 최대 10에서 시작해요. 브로치에는 상위 ' + BM.CONFIG.gem.colorCount + '개 능력치 색이 들어가요. 정식 앱에서는 매일의 수련으로 브로치 보석의 색과 오오라가 계속 바뀌어요.</p>' +
+      '<button class="btn gold block" data-a="png">결과 이미지 저장</button>' +
       '<button class="btn ghost block" data-a="redo">답변 다시 보기</button>' +
-      '<button class="btn block" data-a="next">다음 사람 테스트 시작</button>' +
+      '<button class="btn block" data-a="next">다음 사람 진단 시작</button>' +
       '</div>';
     brooch(app.querySelector('canvas[data-brooch]'), spec);
     UI.hydrateGems(app);
