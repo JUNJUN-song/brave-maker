@@ -272,3 +272,9 @@ details.fold[open] > summary { margin-bottom: 18px; }
 .look-pick .btn canvas { width: min(120px, 32vw); height: auto; }
 .look-pick .btn[aria-pressed="true"] { background: #4b3bb0; font-weight: 700; }
 .look-pick .btn[aria-pressed="true"]::after { content: ''; position: absolute; right: 8px; top: 8px; width: 8px; height: 8px; background: var(--gold); box-shadow: 4px 4px 0 0 var(--line); }
+
+/* ---------- 첫 화면의 '시작의 마을' (village.html iframe). 마을이 뜨면 초상화 두 장은 숨김, 못 띄우면 상자를 지우고 초상화를 보임 ---------- */
+.village-box { position: relative; height: min(84vw, 360px); margin: 8px 4px 14px; background: #05060f; overflow: hidden;
+  box-shadow: 0 -4px 0 0 var(--line), 0 4px 0 0 var(--line), -4px 0 0 0 var(--line), 4px 0 0 0 var(--line); }
+.village-box iframe { display: block; width: 100%; height: 100%; border: 0; }
+.has-village .hero-pair { display: none; }

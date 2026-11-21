@@ -70,11 +70,42 @@
     }
   }
 
+  // ---------- 첫 화면의 '시작의 마을' (village.html 을 iframe 으로, 2026-11-22) ----------
+  //  기본은 기기 시계에 맞춘 시간(time=auto) — 마을 안 왼쪽 위 화살표 단추로 보는 사람이 직접 바꿀 수 있다.
+  //  저장된 용사가 있으면 그 모습과 (날씨를 켰다면) 비·눈을 넘긴다.
+  //  마을을 못 띄우면(파일 하나짜리 앱, three.js 를 못 읽음, WebGL 꺼짐, 20초 넘게 걸림) 예전 초상화 두 장을 대신 보여 준다.
+  //  앱이 다른 페이지 안에 들어가 있을 때(window !== top)는 넣지 않는다 — 인터넷이 끊기면 서비스워커가 없는 파일 대신 index.html 을 주므로 겹겹이 들어가는 것을 막음
+  const villageOK = () => window === window.top && !!document.querySelector('script[src*="js/app.js"]');
+  let villageTimer = 0;
+  function villageBox(saved) {
+    if (!villageOK()) return '';
+    const q = ['embed', 'time=auto'];
+    if (saved && saved.profile) q.push('hero=' + (saved.profile.look === 'boy' ? 'male' : 'female'));
+    let w = 'clear'; try { w = saved ? BM.weather.kind(saved) : 'clear'; } catch (e) { /* 날씨를 몰라도 맑음으로 */ }
+    if (w === 'rain' || w === 'snow') q.push('weather=' + w);
+    return '<div class="village-box" id="vbox"><iframe title="시작의 마을" src="village.html#' + q.join('&') + '"></iframe></div>';
+  }
+  function villageWatch() {
+    const box = document.getElementById('vbox'); if (!box) return;
+    const fr = box.querySelector('iframe'), scr = box.closest('.screen');
+    const giveUp = () => { clearTimeout(villageTimer); window.removeEventListener('message', onMsg); if (box.isConnected) { box.remove(); if (scr) scr.classList.remove('has-village'); } };
+    function onMsg(e) {
+      if (!box.isConnected) { window.removeEventListener('message', onMsg); return; }
+      if (e.source !== fr.contentWindow || !e.data) return;
+      if (e.data.village === 'ready') { clearTimeout(villageTimer); box.classList.add('ready'); }
+      else if (e.data.village === 'fail') giveUp();
+    }
+    window.addEventListener('message', onMsg);
+    clearTimeout(villageTimer);
+    villageTimer = setTimeout(() => { if (!box.classList.contains('ready')) giveUp(); }, 20000);
+  }
+
   // ---------- A. 시작 ----------
   function renderTitle() {
-    const saved = ST.load();
+    const saved = ST.load(), vb = villageBox(saved);
     app.innerHTML =
-      '<div class="screen">' +
+      '<div class="screen' + (vb ? ' has-village' : '') + '">' +
+      vb +
       '<div class="hero-pair">' + UI.heroCard('demo-girl') + UI.heroCard('demo-boy') + '</div>' +
       '<div class="title-logo"><div class="ko">용사 키우기</div><div class="en">BRAVE MAKER</div></div>' +
       '<p class="center muted" style="margin:14px 8px 18px">현실의 나를, 내가 원하는 용사로.<br>나의 선택과 행동이 가슴의 보석이 돼요.</p>' +
@@ -90,6 +121,7 @@
       '<p class="notice center">모든 기록은 이 기기에만 저장돼요. 서버로 보내지 않아요.</p>' +
       '</div>';
     mountDemos();
+    villageWatch();
     app.onclick = async e => {
       const a = e.target.closest('[data-a]'); if (!a) return;
       if (a.dataset.a === 'new') {
