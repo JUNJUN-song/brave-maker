@@ -75,15 +75,25 @@
   //  저장된 용사가 있으면 그 모습과 (날씨를 켰다면) 비·눈을 넘긴다.
   //  마을을 못 띄우면(파일 하나짜리 앱, three.js 를 못 읽음, WebGL 꺼짐, 20초 넘게 걸림) 예전 초상화 두 장을 대신 보여 준다.
   //  앱이 다른 페이지 안에 들어가 있을 때(window !== top)는 넣지 않는다 — 인터넷이 끊기면 서비스워커가 없는 파일 대신 index.html 을 주므로 겹겹이 들어가는 것을 막음
-  const villageOK = () => window === window.top && !!document.querySelector('script[src*="js/app.js"]');
+  // 파일 하나짜리 앱(brave-maker-app.html)에는 빌드가 마을 페이지 전체(three.js·글꼴 포함)를 BM_VILLAGE_B64 로 넣어 둔다 → Blob 주소로 iframe 에 띄움 (2026-11-22 "app 실행 시에도 적용되게")
+  let villageUrl = null;
+  function villageSrc() {
+    if (!window.BM_VILLAGE_B64) return 'village.html';
+    if (!villageUrl) { const bin = atob(window.BM_VILLAGE_B64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); villageUrl = URL.createObjectURL(new Blob([u8], { type: 'text/html;charset=utf-8' })); }
+    return villageUrl;
+  }
+  const villageOK = () => window === window.top && (!!window.BM_VILLAGE_B64 || !!document.querySelector('script[src*="js/app.js"]'));
   let villageTimer = 0, villageFailed = false;
+  // 톱니바퀴 (도트): 마을 단추 안에 넣는 옵션 표시
+  const GEAR = '<svg class="gear" viewBox="0 0 11 11" width="14" height="14" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M4 0h3v2h1V1h2v2H9v1h2v3H9v1h1v2H8V9H7v2H4V9H3v1H1V8h1V7H0V4h2V3H1V1h2v1h1zM4 4v3h3V4z"/></svg>';
   function villageBox(saved, full) {
     if (!villageOK()) return '';
     const q = ['embed', 'time=auto'];
+    if (full) q.push('optbtn=0');                 // 마을 탭: 옵션 단추는 아래 메뉴의 마을 단추(톱니바퀴)가 대신함
     if (saved && saved.profile) q.push('hero=' + (saved.profile.look === 'boy' ? 'male' : 'female'));
     let w = 'clear'; try { w = saved ? BM.weather.kind(saved) : 'clear'; } catch (e) { /* 날씨를 몰라도 맑음으로 */ }
     if (w === 'rain' || w === 'snow') q.push('weather=' + w);
-    return '<div class="village-box' + (full ? ' full' : '') + '" id="vbox"><iframe title="시작의 마을" src="village.html#' + q.join('&') + '"></iframe></div>';
+    return '<div class="village-box' + (full ? ' full' : '') + '" id="vbox"><iframe title="시작의 마을" src="' + villageSrc() + '#' + q.join('&') + '"></iframe></div>';
   }
   function villageWatch(onFail) {
     const box = document.getElementById('vbox'); if (!box) return;
@@ -102,7 +112,8 @@
 
   // ---------- A. 시작 ----------
   function renderTitle() {
-    const saved = ST.load(), vb = villageBox(saved);
+    // 마을은 처음 화면에는 넣지 않는다 — 모습·이름 선택과 진단 질문이 끝나 용사가 생긴 뒤부터 (2026-11-22 사용자: "게임 처음부터 뜨는 게 아니고 선택지랑 질문이 끝나면")
+    const saved = ST.load(), vb = '';
     app.innerHTML =
       '<div class="screen' + (vb ? ' has-village' : '') + '">' +
       vb +
@@ -334,7 +345,9 @@
       tabHtml(R) +
       '</div>' +
       '<nav class="tabs" aria-label="메뉴"><div class="in" style="grid-template-columns:repeat(' + TABS.length + ',1fr)">' +
-      TABS.map(([k, l]) => '<button class="btn" data-tab="' + k + '" ' + (view.tab === k ? 'aria-current="page"' : '') + '>' + l + '</button>').join('') +
+      // 마을 탭에 있을 때는 마을 단추 안에 톱니바퀴: 다시 누르면 마을 옵션 줄이 펴지고 접힘 (마을 화면에는 단추를 두지 않아 깔끔하게, 2026-11-22)
+      TABS.map(([k, l]) => '<button class="btn" data-tab="' + k + '" ' + (view.tab === k ? 'aria-current="page"' : '') +
+        (k === 'village' && view.tab === k ? ' aria-expanded="' + !!view.vopts + '" aria-label="마을 · 옵션 ' + (view.vopts ? '접기' : '펴기') + '">' + l + GEAR : '>' + l) + '</button>').join('') +
       '</div></nav>';
     const r0 = S.diagnosis.result, top4 = ids => ids.slice(0, BM.CONFIG.gem.colorCount);
     app.querySelectorAll('canvas[data-brooch]').forEach(c => {
@@ -366,7 +379,7 @@
   }
 
   // 마을 탭: 시작의 마을을 화면 가득. 주인공은 내 용사 모습, 시간은 자동(마을 안 화살표 단추로 바꿈)
-  function tabVillage() { return villageBox(S, true); }
+  function tabVillage() { view.vopts = false; return villageBox(S, true); }   // 새로 그리면 옵션 줄은 접힌 채로 시작
 
   function tabQuest(R) {
     const d = view.date, today = U.today();
@@ -517,7 +530,16 @@
 
   async function onHomeClick(e, R) {
     const tab = e.target.closest('[data-tab]');
-    if (tab) { view.tab = tab.dataset.tab; window.scrollTo(0, 0); return render(); }
+    if (tab) {
+      if (tab.dataset.tab === 'village' && view.tab === 'village') {           // 마을 탭에서 마을 단추(톱니바퀴)를 다시 누름 → 옵션 줄 펴기·접기 (마을을 다시 짓지 않음)
+        view.vopts = !view.vopts;
+        const fr = document.querySelector('#vbox iframe');
+        if (fr && fr.contentWindow) fr.contentWindow.postMessage({ village: { options: view.vopts } }, '*');
+        tab.setAttribute('aria-expanded', view.vopts); tab.setAttribute('aria-label', '마을 · 옵션 ' + (view.vopts ? '접기' : '펴기'));
+        return;
+      }
+      view.tab = tab.dataset.tab; view.vopts = false; window.scrollTo(0, 0); return render();
+    }
     const j = e.target.closest('[data-j]');
     if (j) {
       const t = S.tasks.find(x => x.id === j.dataset.t); if (!t) return;

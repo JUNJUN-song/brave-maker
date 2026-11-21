@@ -7,6 +7,7 @@
 
   2) 주소 뒤 # 다음에 설정을 & 로 이어 적는다(? 뒤에 적어도 된다).
        embed            제목과 아래 버튼을 숨기고 마을만 화면 가득 보여 준다
+       optbtn=0         마을 안의 옵션 단추(▲ 옵션)를 숨긴다 — 게임 쪽 단추가 postMessage({ village: { options: 'toggle' } }) 로 옵션 줄을 펴고 접을 때
        lock             손가락으로 돌리거나 확대하지 못하게 한다(배경으로만 쓸 때)
        time=            auto 기기 시계에 맞춤(적지 않으면 이것) · dawn 새벽 · day 낮 · dusk 해질녘 · eve 저녁 · night 밤
                         자동일 때: 새벽 04~07 · 낮 07~18 · 해질녘 18~19 · 저녁 19~22 · 밤 22~04 (앱의 모험 장면과 같은 경계)
@@ -100,6 +101,7 @@ button[aria-pressed="true"]{background:var(--glow);color:#2a1c05;border-color:va
 /* 끼워 넣었을 때: 아래 가운데 화살표 단추로 옵션(시간·날씨·자동 회전·확대·주인공·애완동물·처음 시점)을 접었다 폈다 한다. 단추 모양은 앱과 같게(각진 픽셀 테두리) */
 .tpick{position:absolute;left:0;right:0;bottom:6px;display:none;z-index:2;text-align:center;pointer-events:none}
 html.embed .tpick{display:block}
+html.nobtn .tpick{display:none}
 html.embed.opts .controls{display:flex;background:#0a0920;border-top:4px solid #05041a;max-height:55%;overflow:auto}
 html.embed .group span{color:#a9a2d6;font-size:12px;white-space:nowrap}
 html.embed .controls{gap:4px 8px;padding:6px 6px 8px}
@@ -117,7 +119,7 @@ html.embed .controls button[aria-pressed="true"]{background:#c99a2e;color:#1c130
 </head>
 <body>
 <script>/* 끼워 넣기 설정은 화면을 그리기 전에 읽어, 제목과 버튼이 잠깐이라도 비치지 않게 한다 */
-(function(){var s='&'+(location.search||'').slice(1)+'&'+(location.hash||'').slice(1)+'&',d=document.documentElement;if(/&(embed|ui=0)&/.test(s))d.classList.add('embed');if(/&lock(=1)?&/.test(s))d.classList.add('lock');})();
+(function(){var s='&'+(location.search||'').slice(1)+'&'+(location.hash||'').slice(1)+'&',d=document.documentElement;if(/&(embed|ui=0)&/.test(s))d.classList.add('embed');if(/&lock(=1)?&/.test(s))d.classList.add('lock');if(/&optbtn=0&/.test(s))d.classList.add('nobtn');})();
 </script>
 <div class="app">
   <header>
@@ -1774,6 +1776,7 @@ function main(){
     if (o.weather !== undefined) setWeather(o.weather);
     if (o.hero !== undefined) setHero(o.hero);
     if (o.pet !== undefined) setPet(o.pet);
+    if (o.options !== undefined) tpOpen(o.options === 'toggle' ? !document.documentElement.classList.contains('opts') : isOn(o.options));   // 옵션 줄 펴기·접기 (게임 쪽 단추에서 부를 때)
     if (o.follow !== undefined) followHero(isOn(o.follow));
     if (o.spin !== undefined) { spin = isOn(o.spin); lastTouch = -1e9; const b = document.getElementById('btnSpin'); b.setAttribute('aria-pressed', spin); b.textContent = spin ? '켜짐' : '꺼짐'; }
   }

@@ -282,3 +282,6 @@ details.fold[open] > summary { margin-bottom: 18px; }
 .village-box.full { position: fixed; left: 0; right: 0; top: 0; bottom: calc(72px + env(safe-area-inset-bottom)); height: auto; margin: 0; box-shadow: none; z-index: 5; }
 .screen.village-tab { animation: none; }
 .tabs .btn { padding-left: 4px; padding-right: 4px; }
+/* 마을 단추 안의 톱니바퀴 (옵션 펴기·접기). 펴져 있으면 금색 */
+.tabs .btn .gear { display: inline-block; vertical-align: -2px; margin-left: 5px; color: #d7d1ff; }
+.tabs .btn[aria-expanded="true"] .gear { color: var(--gold); }
