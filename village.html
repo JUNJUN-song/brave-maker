@@ -10,7 +10,7 @@
        lock             손가락으로 돌리거나 확대하지 못하게 한다(배경으로만 쓸 때)
        time=            auto 기기 시계에 맞춤(적지 않으면 이것) · dawn 새벽 · day 낮 · dusk 해질녘 · eve 저녁 · night 밤
                         자동일 때: 새벽 04~07 · 낮 07~18 · 해질녘 18~19 · 저녁 19~22 · 밤 22~04 (앱의 모험 장면과 같은 경계)
-                        embed 모드에서는 왼쪽 위 화살표 단추(▼)를 누르면 시간 선택지가 펼쳐져 보는 사람이 직접 바꿀 수 있다
+                        embed 모드에서는 아래 가운데 화살표 단추(▲ 옵션)를 누르면 옵션 줄이 펼쳐지고 다시 누르면 접힌다
        weather=         clear 맑음 · rain 비 · snow 눈
        hero=            male · female
        pet=             none · cat · dog
@@ -97,20 +97,22 @@ button:hover{border-color:var(--glow-deep)}
 button:active{transform:translateY(1px);border-bottom-width:2px}
 button:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
 button[aria-pressed="true"]{background:var(--glow);color:#2a1c05;border-color:var(--glow-deep)}
-/* 끼워 넣었을 때의 시간 고르기 (앱 버튼과 같은 모양: 각진 픽셀 테두리). 화살표 단추를 누르면 선택지가 펼쳐진다 */
-.tpick{position:absolute;left:8px;top:8px;display:none;z-index:2;max-width:calc(100% - 16px)}
+/* 끼워 넣었을 때: 아래 가운데 화살표 단추로 옵션(시간·날씨·자동 회전·확대·주인공·애완동물·처음 시점)을 접었다 폈다 한다. 단추 모양은 앱과 같게(각진 픽셀 테두리) */
+.tpick{position:absolute;left:0;right:0;bottom:6px;display:none;z-index:2;text-align:center;pointer-events:none}
 html.embed .tpick{display:block}
-.tpick button{
+html.embed.opts .controls{display:flex;background:#0a0920;border-top:4px solid #05041a;max-height:55%;overflow:auto}
+html.embed .group span{color:#a9a2d6;font-size:12px;white-space:nowrap}
+html.embed .controls{gap:4px 8px;padding:6px 6px 8px}
+html.embed .group{gap:2px;flex-wrap:wrap;justify-content:center}
+.tpick button,html.embed .controls button{
   font-family:var(--font-body);font-size:13px;line-height:1.2;color:#f4f0ff;background:#231d5a;
-  border:0;border-radius:0;min-height:40px;min-width:44px;padding:6px 10px;margin:2px;cursor:pointer;
+  border:0;border-radius:0;min-height:40px;min-width:44px;padding:6px 8px;margin:2px;cursor:pointer;pointer-events:auto;white-space:nowrap;
   box-shadow:0 -2px 0 0 #05041a,0 2px 0 0 #05041a,-2px 0 0 0 #05041a,2px 0 0 0 #05041a,inset 0 2px 0 0 rgba(255,255,255,.22),inset 0 -2px 0 0 rgba(0,0,0,.35);
 }
-.tpick button:active{transform:translateY(1px)}
-.tpick button:focus-visible{outline:2px solid #ffd76a;outline-offset:2px}
-.tpick button[aria-pressed="true"]{background:#c99a2e;color:#1c1300;font-weight:700}
-.tpick #tpBtn .arr{color:#ffd76a;margin-left:6px}
-.tpick .list{display:flex;flex-wrap:wrap;margin-top:4px}
-.tpick .list[hidden]{display:none}
+.tpick button:active,html.embed .controls button:active{transform:translateY(1px)}
+.tpick button:focus-visible,html.embed .controls button:focus-visible{outline:2px solid #ffd76a;outline-offset:2px}
+html.embed .controls button[aria-pressed="true"]{background:#c99a2e;color:#1c1300;font-weight:700}
+.tpick #tpBtn .arr{color:#ffd76a;margin-right:6px}
 </style>
 </head>
 <body>
@@ -128,14 +130,11 @@ html.embed .tpick{display:block}
     <div class="hint" id="hint">마을을 짓는 중이에요…</div>
     <div class="fail" id="fail">3D 화면을 열지 못했어요.<br>브라우저에서 WebGL을 켜고 다시 열어 주세요.</div>
     <div class="tpick" id="tpick">
-      <button id="tpBtn" aria-expanded="false" aria-controls="tpList" aria-label="마을 시간 바꾸기"><span id="tpNow">자동</span><span class="arr" id="tpArr" aria-hidden="true">▼</span></button>
-      <div class="list" id="tpList" role="group" aria-label="마을 시간" hidden>
-        <button data-t="auto" aria-pressed="true">자동</button><button data-t="dawn" aria-pressed="false">새벽</button><button data-t="day" aria-pressed="false">낮</button><button data-t="dusk" aria-pressed="false">해질녘</button><button data-t="eve" aria-pressed="false">저녁</button><button data-t="night" aria-pressed="false">밤</button>
-      </div>
+      <button id="tpBtn" aria-expanded="false" aria-controls="controls"><span class="arr" id="tpArr" aria-hidden="true">▲</span><span id="tpNow">옵션</span></button>
     </div>
   </div>
 
-  <div class="controls">
+  <div class="controls" id="controls">
     <div class="group"><span>시간</span><button id="btn-auto" aria-pressed="false">자동</button><button id="btn-dawn" aria-pressed="false">새벽</button><button id="btn-day" aria-pressed="false">낮</button><button id="btn-dusk" aria-pressed="false">해질녘</button><button id="btn-eve" aria-pressed="true">저녁</button><button id="btn-night" aria-pressed="false">밤</button></div>
     <div class="group"><span>날씨</span><button id="btn-w-clear" aria-pressed="true">맑음</button><button id="btn-w-rain" aria-pressed="false">비</button><button id="btn-w-snow" aria-pressed="false">눈</button></div>
     <div class="group"><span>자동 회전</span><button id="btnSpin" aria-pressed="false">꺼짐</button></div>
@@ -1722,17 +1721,11 @@ function main(){
   };
   let heartBase = 1.3, timeNow = 'eve', weatherNow = 'clear', autoOn = false;   // autoOn = 기기 시계에 맞추는 중
   const eyebrow = document.querySelector('.eyebrow');
-  // 끼워 넣었을 때의 시간 고르기: 화살표 단추를 누르면 자동·새벽·낮·해질녘·저녁·밤이 펼쳐지고, 고르면 접힌다. 기본은 자동
-  const tpBtn = document.getElementById('tpBtn'), tpList = document.getElementById('tpList'), tpNow = document.getElementById('tpNow'), tpArr = document.getElementById('tpArr');
-  const tpOpen = on => { tpList.hidden = !on; tpBtn.setAttribute('aria-expanded', on); tpArr.textContent = on ? '▲' : '▼'; };
-  tpBtn.addEventListener('click', () => tpOpen(tpList.hidden));
-  tpList.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; configure({ time: b.dataset.t }); tpOpen(false); });
-  canvas.addEventListener('pointerdown', () => tpOpen(false));
-  function syncPicker() {
-    tpNow.textContent = (autoOn ? '자동 · ' : '') + TIMES[timeNow].label;
-    tpList.querySelectorAll('[data-t]').forEach(b => b.setAttribute('aria-pressed', autoOn ? b.dataset.t === 'auto' : b.dataset.t === timeNow));
-    document.getElementById('btn-auto').setAttribute('aria-pressed', autoOn);
-  }
+  // 끼워 넣었을 때: 아래 가운데 화살표 단추를 누르면 기존 옵션 줄(시간·날씨·자동 회전·확대·주인공·애완동물·처음 시점)이 펼쳐지고, 다시 누르면 접힌다
+  const tpBtn = document.getElementById('tpBtn'), tpNow = document.getElementById('tpNow'), tpArr = document.getElementById('tpArr');
+  const tpOpen = on => { document.documentElement.classList.toggle('opts', on); tpBtn.setAttribute('aria-expanded', on); tpArr.textContent = on ? '▼' : '▲'; tpNow.textContent = on ? '옵션 접기' : '옵션'; };
+  tpBtn.addEventListener('click', () => tpOpen(!document.documentElement.classList.contains('opts')));
+  function syncPicker() { document.getElementById('btn-auto').setAttribute('aria-pressed', autoOn); }
   function apply() {
     const T = TIMES[timeNow], W = WEATHERS[weatherNow];
     for (const f of repaint) f(T.lamp, weatherNow === 'snow');

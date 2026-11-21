@@ -50,10 +50,10 @@
   }
 
   function quiz() {
-    if (!Array.isArray(S.order)) S.order = [];   // 적응형 35문항 (BM.adaptive)
+    if (!Array.isArray(S.order)) S.order = [];   // 적응형 진단 (BM.adaptive, 120문항 중 40문항)
     UI.quiz(app, {
       bank: BM.QUESTION_BANK, seed: S.seed, answers: S.answers, cursor: S.cursor,
-      order: S.order, total: BM.adaptive.TOTAL, extend: () => { BM.adaptive.extend(BM.QUESTION_BANK, S.order, S.answers); save(); },
+      order: S.order, total: BM.adaptive.TOTAL, extend: () => { BM.adaptive.extend(BM.QUESTION_BANK, S.order, S.answers, S.seed); save(); },
       onAnswer: save, onCursor: i => { S.cursor = i; save(); },
       onDone: () => {
         S.result = BM.adaptive.compute(BM.QUESTION_BANK, S.order, S.answers);

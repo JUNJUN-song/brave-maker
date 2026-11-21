@@ -1,22 +1,22 @@
-/* 적응형 진단 — 문항 은행 65개(생활 습관 20 + 상황 45) 중 사람마다 35문항만 묻는다 (명세 11장, 2026-11-15)
+/* 적응형 진단 — 문항 은행 120개(생활 습관 20 + 상황 100) 중 사람마다 40문항만 묻는다 (명세 11장 2026-11-15 → 2026-11-22 사용자 요청으로 100·40)
  *
  *  1. 앵커 11문항: 능력치 11개를 하나씩 직접 보는 생활 습관 문항 (모든 사람 공통, 순서 고정)
- *  2. 적응형 24문항: 매 응답 뒤 아직 안 물어본 문항마다 점수를 매겨 가장 높은 것 하나를 다음 질문으로 (무작위 아님, 동점은 id 순)
+ *  2. 적응형 29문항: 매 응답 뒤 아직 안 물어본 문항마다 점수를 매겨 가장 높은 것 하나를 다음 질문으로 (무작위 아님, 동점은 id 순)
  *       점수 = 0.15·덜 본 능력치 보강 + 0.10·선택지 변별력 + 0.10·맥락 다양성 + 0.65·지금까지 드러난 강한 성향 확인 − 0.30·비슷한 질문
  *     (명세 제안값은 0.35·0.30·0.20·0.15 — 사용자 요청 "초반 답변 성향에 따라 질문을 선별, 사람 성향마다 확연히 다른 결과"에 맞춰
  *      성향 확인을 크게. 대신 모든 능력치를 최소 3번은 보도록 안전장치)
  *     각 항은 후보들 안에서 0~1 로 맞춘 뒤 더한다. 같은 답이면 언제나 같은 질문 순서가 나온다.
- *  3. 35문항이 끝나면 '답한 35문항만으로 된 은행'으로 기존 채점(BM.scoring.compute)을 그대로 돌린다
+ *  3. 40문항이 끝나면 '답한 40문항만으로 된 은행'으로 기존 채점(BM.scoring.compute)을 그대로 돌린다
  *     (관찰 기회 보정·200점 분배·희귀 상한 로직 그대로, 기회는 답한 문항 기준으로 다시 계산됨)
  */
 window.BM = window.BM || {};
 BM.adaptive = (function () {
-  const TOTAL = 35;
+  const TOTAL = 40;   // 2026-11-22: 은행이 120문항(습관 20 + 상황 100)으로 늘어 35 → 40
   // 체력 B01 · 지능 B07 · 창조력 B09 · 경제력 B11 · 인격력 B17 · 지도력 B19 · 절제력 B05 · 회복력 B20 · 매력 B12 · 신성력 B18 · 자존감 B15
   const ANCHORS = ['B01', 'B07', 'B09', 'B11', 'B17', 'B19', 'B05', 'B20', 'B12', 'B18', 'B15'];
   // 가중치 (가상 응답자 5명 시뮬레이션으로 정함, docs/NOTES.md v1.7.0): 성향 확인을 크게 → 사람마다 받는 질문이 24개 중 약 13개 다름,
   //  그래도 모든 능력치 최소 3번 관찰(아래 안전장치), 65문항 전부 답했을 때와 점수 차 평균 약 2점
-  const WT = { coverage: 0.15, info: 0.10, context: 0.10, fit: 0.65, dup: 0.30 };
+  const WT = { coverage: 0.15, info: 0.10, context: 0.10, fit: 0.65, dup: 0.30, vary: 0.12 };   // vary = 용사마다 다른 작은 흔들림(시드 고정) → 비슷한 성향이어도 받는 질문이 조금씩 다름
   const MIN_OPP = 3;                   // 능력치마다 최소 관찰 기회
   const BOOST = [1, 0.7, 0.45, 0.2];   // 지금까지 드러난 성향 1~4위 능력치를 확인하는 정도
 
@@ -61,7 +61,7 @@ BM.adaptive = (function () {
   }
 
   // 다음 질문 id (35개를 다 골랐으면 null). 점수 내역도 함께 돌려줌 (selection snapshot)
-  function next(bank, order, answers) {
+  function next(bank, order, answers, seed) {
     if (order.length >= TOTAL) return null;
     const anchor = ANCHORS.find(id => !order.includes(id));
     if (anchor) return { id: anchor, why: 'anchor' };
@@ -88,7 +88,8 @@ BM.adaptive = (function () {
     });
     const norm = k => { const mx = Math.max(...raw.map(r => r[k])), mn = Math.min(...raw.map(r => r[k])); raw.forEach(r => { r[k + 'N'] = mx - mn > 1e-9 ? (r[k] - mn) / (mx - mn) : 0; }); };
     ['coverage', 'info', 'context', 'fit'].forEach(norm);
-    raw.forEach(r => { r.score = WT.coverage * r.coverageN + WT.info * r.infoN + WT.context * r.contextN + WT.fit * r.fitN - WT.dup * r.dup; });
+    const vary = q => (seed == null ? 0 : BM.util.rng(BM.util.hash(seed, q.id, 'pick'))());   // 0~1, 같은 용사·같은 문항이면 늘 같은 값
+    raw.forEach(r => { r.score = WT.coverage * r.coverageN + WT.info * r.infoN + WT.context * r.contextN + WT.fit * r.fitN - WT.dup * r.dup + WT.vary * vary(r.q); });
     raw.sort((a, b) => (b.score - a.score) || (a.q.id < b.q.id ? -1 : 1));
     const best = raw[0];
     return { id: best.q.id, why: 'adaptive', score: +best.score.toFixed(3) };
@@ -96,10 +97,10 @@ BM.adaptive = (function () {
 
   // 순서 목록 채우기: 비었거나 마지막 문항까지 답했으면 다음 1개를 붙인다.
   //  앞 질문의 답을 바꿔도 이미 답한 문항은 그대로 두고, 아직 안 나온 뒤 문항만 바뀐 답을 기준으로 고른다 (명세 권장 정책)
-  function extend(bank, order, answers) {
+  function extend(bank, order, answers, seed) {
     if (order.length >= TOTAL) return order;
     if (order.length && !Number.isInteger(answers[order[order.length - 1]])) return order;
-    const n = next(bank, order, answers);
+    const n = next(bank, order, answers, seed);
     if (n) order.push(n.id);
     return order;
   }
@@ -111,9 +112,9 @@ BM.adaptive = (function () {
     return r;
   }
   // 처음부터 끝까지 한 번에 (테스트·시뮬레이션용): answerFor(q) → 선택지 번호
-  function run(bank, answerFor) {
+  function run(bank, answerFor, seed) {
     const order = [], answers = {};
-    while (order.length < TOTAL) { const n = next(bank, order, answers); order.push(n.id); answers[n.id] = answerFor(byId(bank)[n.id]); }
+    while (order.length < TOTAL) { const n = next(bank, order, answers, seed); order.push(n.id); answers[n.id] = answerFor(byId(bank)[n.id]); }
     return { order, answers, result: compute(bank, order, answers) };
   }
   return { TOTAL, ANCHORS, WT, BOOST, next, extend, isComplete, compute, subBank, run, obs };

@@ -151,7 +151,7 @@
       '<p class="center" style="margin:14px 0 0">용사 <b class="gold" id="pv">___</b></p>' +
       '</div>' +
       '<p class="center small gold" id="hint" aria-live="polite" style="margin:4px 0 0">모습을 골라 주세요</p>' +
-      '<button class="btn gold block" id="go" disabled>진단 시작 (' + BM.adaptive.TOTAL + '문항 · 약 5분) ▶</button>' +
+      '<button class="btn gold block" id="go" disabled>진단 시작 (' + BM.adaptive.TOTAL + '문항 · 약 6분) ▶</button>' +
       '<button class="btn ghost block" id="back">◀ 처음으로</button>' +
       '</div>';
     let pick = null;
@@ -178,13 +178,13 @@
   // ---------- B. 진단 ----------
   function renderQuiz() {
     app.onclick = null;
-    // 적응형 35문항 (BM.adaptive): 질문 순서 목록을 저장해 두어 앱을 닫았다 열어도 같은 질문으로 이어짐
+    // 적응형 진단 (BM.adaptive, 120문항 중 40문항): 질문 순서 목록을 저장해 두어 앱을 닫았다 열어도 같은 질문으로 이어짐
     if (!Array.isArray(S.diagnosis.order)) S.diagnosis.order = [];
     S.diagnosis.mode = 'adaptive' + BM.adaptive.TOTAL;
     UI.quiz(app, {
       bank: BM.QUESTION_BANK, seed: S.profile.seed, answers: S.diagnosis.answers, cursor: S.diagnosis.cursor,
       order: S.diagnosis.order, total: BM.adaptive.TOTAL,
-      extend: () => { BM.adaptive.extend(BM.QUESTION_BANK, S.diagnosis.order, S.diagnosis.answers); persist(); },
+      extend: () => { BM.adaptive.extend(BM.QUESTION_BANK, S.diagnosis.order, S.diagnosis.answers, S.profile.seed); persist(); },
       onAnswer: () => persist(), onCursor: i => { S.diagnosis.cursor = i; persist(); },
       onDone: () => analyze()
     });

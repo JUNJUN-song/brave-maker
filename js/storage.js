@@ -13,7 +13,7 @@ BM.storage = (function () {
       app: 'BRAVE_MAKER',
       phase: 'quiz',
       profile: { name: name, look: look === 'boy' ? 'boy' : 'girl', seed: BM.util.newSeed(), createdAt: new Date().toISOString(), startDate: today },
-      diagnosis: { bankVersion: BM.QUESTION_BANK.version, mode: 'adaptive35', order: [], answers: {}, cursor: 0, result: null, completedAt: null },   // order = 적응형으로 고른 질문 순서 (BM.adaptive)
+      diagnosis: { bankVersion: BM.QUESTION_BANK.version, mode: 'adaptive40', order: [], answers: {}, cursor: 0, result: null, completedAt: null },   // order = 적응형으로 고른 질문 순서 (BM.adaptive)
       tasks: [],
       records: {},
       settings: { reducedMotion: 'auto' }

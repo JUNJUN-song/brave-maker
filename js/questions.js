@@ -1,8 +1,8 @@
 /* 질문 데이터 — 자동 생성 파일 (dev/import_questions.ps1). 직접 고치지 말고 원본 JSON을 고친 뒤 다시 변환할 것.
- * 원본: question_bank_v0.3_habits_first.json / question_bank_0.3.1_habits_first */
+ * 원본: question_bank_v0.3_habits_first.json / question_bank_0.4.0_habits_first */
 window.BM = window.BM || {};
 BM.QUESTION_BANK = {
-  version: 'question_bank_0.3.1_habits_first',
+  version: 'question_bank_0.4.0_habits_first',
   choiceBudget: 5,
   mix: { habit: 0.7, scenario: 0.3 },
   questions: [
@@ -450,6 +450,343 @@ BM.QUESTION_BANK = {
       { text: '끝까지 다 마치고 잔다.', w: { discipline: 3, create: 1 }, sr: 0, al: 0, tag: null },
       { text: '할 일은 내려놓고 좋아하는 음악을 들으며 일부러 쉰다.', w: { recovery: 4, esteem: 1 }, sr: 0, al: 0, tag: 'deliberate_rest' },
       { text: '할 일을 미룬 채 휴대폰을 보다가 늦게 잔다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q46', stage: 'scenario', category: 'fit', situation: '엘리베이터가 점검 중이라 5층까지 걸어 올라가야 해요.', choices: [
+      { text: '운동 삼아 빠르게 걸어 올라간다.', w: { fit: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '천천히 쉬어 가며 올라간다.', w: { recovery: 3, fit: 1 }, sr: 1, al: 0, tag: null },
+      { text: '점검이 끝날 때까지 기다리며 밀린 연락을 정리한다.', w: { mind: 2, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '올라가는 김에 이웃의 짐도 같이 들어 준다.', w: { care: 3, fit: 2 }, sr: 0, al: 2, tag: null }
+    ] },
+    { id: 'Q47', stage: 'scenario', category: 'money', situation: '월급이나 용돈이 들어온 날이에요. 가장 먼저 무엇을 하나요?', choices: [
+      { text: '저축할 금액부터 따로 옮긴다.', w: { money: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '이번 달 예산을 항목별로 나눠 적는다.', w: { money: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '고생한 나에게 작은 선물을 한다.', w: { recovery: 2, esteem: 2, charm: 1 }, sr: 2, al: 0, tag: null },
+      { text: '가족이나 고마운 사람에게 밥을 산다.', w: { care: 3, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '특별히 하는 일 없이 평소처럼 쓴다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q48', stage: 'scenario', category: 'charm', situation: '중요한 발표 전날이에요.', choices: [
+      { text: '입을 옷과 머리 모양을 미리 정해 둔다.', w: { charm: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '발표 내용을 한 번 더 소리 내어 연습한다.', w: { mind: 3, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '일찍 자서 컨디션을 맞춘다.', w: { recovery: 4 }, sr: 1, al: 0, tag: null },
+      { text: '동료에게 미리 보여 주고 의견을 듣는다.', w: { lead: 2, care: 1, mind: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q49', stage: 'scenario', category: 'divine', situation: '계산을 마치고 보니 거스름돈을 더 많이 받았어요.', choices: [
+      { text: '바로 돌아가서 돌려준다.', w: { divine: 4, discipline: 1 }, sr: 0, al: 2, tag: null },
+      { text: '다음에 들를 때 말하고 돌려준다.', w: { divine: 2, care: 1, mind: 1 }, sr: 0, al: 1, tag: null },
+      { text: '금액이 작으면 두고, 크면 돌려준다.', w: { mind: 2, money: 1 }, sr: 0, al: 0, tag: null },
+      { text: '모르는 척 그냥 간다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q50', stage: 'scenario', category: 'lead', situation: '여행 계획을 짜야 하는데 아무도 먼저 나서지 않아요.', choices: [
+      { text: '내가 일정 초안을 만들어 공유한다.', w: { lead: 4, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '각자 하고 싶은 것을 물어 정리한다.', w: { lead: 2, care: 3 }, sr: 0, al: 1, tag: null },
+      { text: '예산과 교통편부터 계산해 본다.', w: { money: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '누군가 나설 때까지 기다린다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q51', stage: 'scenario', category: 'create', situation: '방 한쪽 벽이 비어 있어요.', choices: [
+      { text: '직접 그리거나 만든 것으로 꾸민다.', w: { create: 4, charm: 1 }, sr: 1, al: 0, tag: null },
+      { text: '마음에 드는 포스터나 사진을 골라 건다.', w: { charm: 3, create: 1 }, sr: 1, al: 0, tag: null },
+      { text: '수납이나 운동 공간으로 쓸 방법을 궁리한다.', w: { mind: 3, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '깔끔한 게 좋아서 비워 둔다.', w: { discipline: 2, recovery: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q52', stage: 'scenario', category: 'recovery', situation: '며칠째 잠이 부족한데 오늘 저녁 약속이 있어요.', choices: [
+      { text: '약속을 미루고 일찍 잔다.', w: { recovery: 4, esteem: 1 }, sr: 2, al: 0, tag: null },
+      { text: '약속은 지키되 일찍 돌아온다.', w: { care: 2, discipline: 2, recovery: 1 }, sr: 0, al: 1, tag: null },
+      { text: '약속에 가서 끝까지 즐긴다.', w: { care: 3, charm: 1 }, sr: 0, al: 1, tag: null },
+      { text: '커피로 버티며 평소대로 한다.', w: { discipline: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q53', stage: 'scenario', category: 'esteem', situation: '내가 낸 의견이 회의에서 받아들여지지 않았어요.', choices: [
+      { text: '근거를 보완해 다시 제안한다.', w: { esteem: 3, mind: 2 }, sr: 2, al: 0, tag: null },
+      { text: '결정된 방향을 따르며 맡은 일을 한다.', w: { discipline: 3, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '따로 찾아가 이유를 물어본다.', w: { lead: 2, esteem: 2, mind: 1 }, sr: 1, al: 0, tag: null },
+      { text: '내 생각이 틀렸나 보다 하고 접는다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q54', stage: 'scenario', category: 'discipline', situation: '식단을 조절하는 중인데 모임 메뉴가 기름진 음식이에요.', choices: [
+      { text: '정해 둔 양만 먹는다.', w: { discipline: 4, esteem: 1 }, sr: 2, al: 0, tag: null },
+      { text: '오늘은 즐기고 내일 운동으로 보충한다.', w: { fit: 3, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '미리 가볍게 먹고 가서 조금만 먹는다.', w: { mind: 2, discipline: 2, recovery: 1 }, sr: 1, al: 0, tag: null },
+      { text: '분위기를 살리며 함께 즐긴다.', w: { care: 2, lead: 1, charm: 1 }, sr: 0, al: 1, tag: null }
+    ] },
+    { id: 'Q55', stage: 'scenario', category: 'care', situation: '동료가 며칠째 표정이 어두워요.', choices: [
+      { text: '조용히 음료를 건네며 안부를 묻는다.', w: { care: 4 }, sr: 0, al: 2, tag: null },
+      { text: '일을 조금 나눠 맡겠다고 말한다.', w: { care: 2, lead: 2, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '부담 주지 않으려고 지켜본다.', w: { care: 2, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '내 일에 집중한다.', w: { discipline: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q56', stage: 'scenario', category: 'mind', situation: '뉴스에서 처음 듣는 용어가 나왔어요.', choices: [
+      { text: '바로 검색해서 뜻을 찾아본다.', w: { mind: 4 }, sr: 0, al: 0, tag: null },
+      { text: '내 돈 관리와 관련이 있는지 따져 본다.', w: { money: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '아는 사람에게 물어본다.', w: { care: 1, lead: 1, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '그냥 넘어간다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q57', stage: 'scenario', category: 'fit', situation: '친구가 주말 아침 등산을 가자고 해요.', choices: [
+      { text: '좋다고 하고 전날 일찍 잔다.', w: { fit: 3, recovery: 1, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '가볍게 걸을 수 있는 코스로 바꾸자고 한다.', w: { fit: 2, lead: 2, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '등산 대신 점심을 같이 먹자고 한다.', w: { care: 3, recovery: 1 }, sr: 0, al: 1, tag: null },
+      { text: '주말은 쉬고 싶다고 솔직히 말한다.', w: { esteem: 3, recovery: 2 }, sr: 2, al: 0, tag: null }
+    ] },
+    { id: 'Q58', stage: 'scenario', category: 'money', situation: '구독 서비스 결제 알림이 왔는데 요즘 거의 쓰지 않아요.', choices: [
+      { text: '바로 해지한다.', w: { money: 4, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '쓰고 있는 구독을 전부 점검해 정리한다.', w: { money: 3, mind: 1, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '이번 달은 제대로 써 보고 결정한다.', w: { mind: 2, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '귀찮아서 그대로 둔다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q59', stage: 'scenario', category: 'charm', situation: '머리를 자를 때가 됐어요.', choices: [
+      { text: '새로운 스타일에 도전해 본다.', w: { charm: 3, create: 2 }, sr: 1, al: 0, tag: null },
+      { text: '늘 하던 대로 단정하게 다듬는다.', w: { charm: 3, discipline: 2 }, sr: 1, al: 0, tag: null },
+      { text: '사진을 찾아보고 어울리는 스타일을 연구한다.', w: { mind: 2, charm: 3 }, sr: 1, al: 0, tag: null },
+      { text: '아직 괜찮아서 다음 달로 미룬다.', w: { money: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q60', stage: 'scenario', category: 'divine', situation: '버스에서 몸이 불편해 보이는 사람이 서 있어요. 나는 앉아 있고 많이 피곤해요.', choices: [
+      { text: '바로 자리를 양보한다.', w: { divine: 4, care: 1 }, sr: 0, al: 3, tag: null },
+      { text: '괜찮으신지 먼저 물어본다.', w: { care: 3, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '피곤해서 이번에는 그대로 앉아 있는다.', w: { recovery: 3 }, sr: 1, al: 0, tag: null },
+      { text: '주변에 양보할 사람이 있는지 살핀다.', w: { mind: 2, lead: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q61', stage: 'scenario', category: 'lead', situation: '모임에서 행사 담당을 뽑는데 지원자가 없어요.', choices: [
+      { text: '내가 맡겠다고 손을 든다.', w: { lead: 4, esteem: 1 }, sr: 1, al: 0, tag: null },
+      { text: '둘이 나눠서 하자고 제안한다.', w: { lead: 2, care: 2 }, sr: 0, al: 1, tag: null },
+      { text: '잘할 것 같은 사람을 추천한다.', w: { lead: 2, mind: 1, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '지금은 여력이 없어 가만히 있는다.', w: { recovery: 2, esteem: 1 }, sr: 1, al: 0, tag: null }
+    ] },
+    { id: 'Q62', stage: 'scenario', category: 'create', situation: '생일인 친구에게 줄 선물을 고민하고 있어요.', choices: [
+      { text: '직접 만든 것이나 손편지를 준비한다.', w: { create: 4, care: 1 }, sr: 0, al: 1, tag: null },
+      { text: '친구가 필요하다던 물건을 산다.', w: { care: 3, mind: 2 }, sr: 0, al: 1, tag: null },
+      { text: '예산을 정해 그 안에서 고른다.', w: { money: 3, discipline: 1, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '같이 맛있는 것을 먹으며 축하한다.', w: { care: 3, recovery: 1 }, sr: 0, al: 1, tag: null }
+    ] },
+    { id: 'Q63', stage: 'scenario', category: 'recovery', situation: '일요일 저녁, 내일이 벌써 걱정돼요.', choices: [
+      { text: '내일 할 일을 적어 두고 마음을 내려놓는다.', w: { mind: 2, discipline: 1, recovery: 2 }, sr: 1, al: 0, tag: null },
+      { text: '따뜻하게 씻고 일찍 눕는다.', w: { recovery: 4, charm: 1 }, sr: 1, al: 0, tag: null },
+      { text: '가볍게 산책하며 몸을 푼다.', w: { fit: 3, recovery: 2 }, sr: 1, al: 0, tag: null },
+      { text: '친구와 통화하며 기분을 푼다.', w: { care: 3, recovery: 1 }, sr: 0, al: 0, tag: null },
+      { text: '걱정하다가 늦게 잠든다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q64', stage: 'scenario', category: 'esteem', situation: '사람들 앞에서 말하다가 실수로 더듬었어요.', choices: [
+      { text: '웃으며 다시 또박또박 말한다.', w: { esteem: 4, charm: 1 }, sr: 2, al: 0, tag: null },
+      { text: '끝난 뒤 어디서 꼬였는지 돌아본다.', w: { mind: 3, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '다음에는 미리 연습하기로 한다.', w: { discipline: 3, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '한동안 그 장면이 계속 떠오른다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q65', stage: 'scenario', category: 'discipline', situation: '아침 알람이 울렸어요. 계획한 기상 시간이에요.', choices: [
+      { text: '바로 일어나 계획대로 시작한다.', w: { discipline: 4, fit: 1 }, sr: 1, al: 0, tag: null },
+      { text: '5분만 더 누워 있다가 일어난다.', w: { recovery: 2, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '누운 채 오늘 일정을 떠올려 본다.', w: { mind: 3 }, sr: 0, al: 0, tag: null },
+      { text: '알람을 끄고 다시 잔다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q66', stage: 'scenario', category: 'care', situation: '이사하는 친구가 도와 달라고 해요. 그날은 쉬는 날이에요.', choices: [
+      { text: '가서 끝까지 돕는다.', w: { care: 3, fit: 2 }, sr: 0, al: 3, tag: null },
+      { text: '오전만 돕고 오후는 쉰다.', w: { care: 2, recovery: 2 }, sr: 0, al: 1, tag: null },
+      { text: '짐 옮길 순서와 차량을 대신 알아봐 준다.', w: { mind: 2, lead: 2, care: 1 }, sr: 0, al: 1, tag: null },
+      { text: '쉬고 싶다고 말하고 다음에 밥을 산다.', w: { esteem: 2, recovery: 2, care: 1 }, sr: 2, al: 0, tag: null }
+    ] },
+    { id: 'Q67', stage: 'scenario', category: 'mind', situation: '조립식 가구를 샀는데 설명서가 복잡해요.', choices: [
+      { text: '설명서를 처음부터 차근차근 읽는다.', w: { mind: 3, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '일단 감으로 맞춰 본다.', w: { create: 3, esteem: 1 }, sr: 0, al: 0, tag: null },
+      { text: '조립 영상을 찾아본다.', w: { mind: 4 }, sr: 0, al: 0, tag: null },
+      { text: '잘하는 사람에게 도움을 청한다.', w: { care: 1, lead: 2, mind: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q68', stage: 'scenario', category: 'fit', situation: '점심을 먹고 30분이 남았어요.', choices: [
+      { text: '주변을 빠르게 걷는다.', w: { fit: 4, recovery: 1 }, sr: 1, al: 0, tag: null },
+      { text: '눈을 감고 잠깐 쉰다.', w: { recovery: 4 }, sr: 1, al: 0, tag: null },
+      { text: '오후에 할 일을 미리 정리한다.', w: { discipline: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '동료와 이야기를 나눈다.', w: { care: 3, lead: 1 }, sr: 0, al: 1, tag: null }
+    ] },
+    { id: 'Q69', stage: 'scenario', category: 'money', situation: '친구들과 식사한 뒤 계산할 때예요.', choices: [
+      { text: '정확히 나눠서 내자고 한다.', w: { money: 3, discipline: 1, esteem: 1 }, sr: 1, al: 0, tag: null },
+      { text: '이번에는 내가 사겠다고 한다.', w: { care: 3, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '내가 먼저 계산하고 나중에 정산한다.', w: { lead: 2, money: 2, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '다른 사람이 정하는 대로 따른다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q70', stage: 'scenario', category: 'charm', situation: '거울을 보니 요즘 자세가 구부정해졌어요.', choices: [
+      { text: '스트레칭과 자세 교정 운동을 시작한다.', w: { fit: 3, charm: 2 }, sr: 1, al: 0, tag: null },
+      { text: '앉는 습관과 책상 높이를 바꾼다.', w: { mind: 2, discipline: 2, charm: 1 }, sr: 1, al: 0, tag: null },
+      { text: '옷차림으로 보완해 본다.', w: { charm: 3, create: 1 }, sr: 1, al: 0, tag: null },
+      { text: '신경은 쓰이지만 그대로 지낸다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q71', stage: 'scenario', category: 'divine', situation: '함께하는 과제에서 한 사람이 거의 참여하지 않았는데 평가하는 사람은 몰라요.', choices: [
+      { text: '그 사람에게 맡을 부분을 직접 말한다.', w: { lead: 3, esteem: 2 }, sr: 1, al: 0, tag: null },
+      { text: '기여한 내용을 사실대로 적어 낸다.', w: { divine: 3, esteem: 2 }, sr: 1, al: 0, tag: null },
+      { text: '내가 조금 더 하고 넘어간다.', w: { care: 2, discipline: 2 }, sr: 0, al: 1, tag: null },
+      { text: '다른 팀원들과 어떻게 할지 의논한다.', w: { lead: 3, care: 1, mind: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q72', stage: 'scenario', category: 'lead', situation: '식당에서 주문한 음식이 한참 동안 나오지 않아요. 일행은 말을 못 하고 있어요.', choices: [
+      { text: '내가 직원에게 정중히 확인한다.', w: { lead: 3, esteem: 2 }, sr: 1, al: 0, tag: null },
+      { text: '조금 더 기다려 보자고 한다.', w: { care: 2, recovery: 1, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '일행에게 다른 곳으로 옮길지 묻는다.', w: { lead: 2, care: 2 }, sr: 0, al: 0, tag: null },
+      { text: '누군가 말할 때까지 기다린다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q73', stage: 'scenario', category: 'create', situation: '요리하려는데 필요한 재료 하나가 없어요.', choices: [
+      { text: '있는 재료로 새로운 조합을 만들어 본다.', w: { create: 4, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '대신 쓸 수 있는 재료를 검색한다.', w: { mind: 3, create: 1 }, sr: 0, al: 0, tag: null },
+      { text: '가까운 가게에 가서 사 온다.', w: { discipline: 3, fit: 1 }, sr: 0, al: 0, tag: null },
+      { text: '다른 메뉴로 바꾼다.', w: { mind: 2, recovery: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q74', stage: 'scenario', category: 'recovery', situation: '휴가 첫날이에요.', choices: [
+      { text: '아무 계획 없이 푹 쉰다.', w: { recovery: 4 }, sr: 2, al: 0, tag: null },
+      { text: '미뤄 둔 취미를 한다.', w: { create: 3, recovery: 2 }, sr: 1, al: 0, tag: null },
+      { text: '평소 못 한 운동을 한다.', w: { fit: 4 }, sr: 1, al: 0, tag: null },
+      { text: '가족이나 친구를 만난다.', w: { care: 4 }, sr: 0, al: 1, tag: null },
+      { text: '밀린 공부나 일을 한다.', w: { mind: 2, discipline: 3 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q75', stage: 'scenario', category: 'esteem', situation: 'SNS에서 또래의 성공 소식을 봤어요.', choices: [
+      { text: '축하 메시지를 보낸다.', w: { care: 3, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '내 속도대로 가면 된다고 생각한다.', w: { esteem: 4, recovery: 1 }, sr: 3, al: 0, tag: null },
+      { text: '자극을 받아 내 목표를 다시 점검한다.', w: { discipline: 2, mind: 2, esteem: 1 }, sr: 1, al: 0, tag: null },
+      { text: '한동안 기분이 가라앉는다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q76', stage: 'scenario', category: 'discipline', situation: '영상을 보다 보니 자려던 시간이 됐어요.', choices: [
+      { text: '바로 끄고 잘 준비를 한다.', w: { discipline: 4, recovery: 1 }, sr: 1, al: 0, tag: null },
+      { text: '보던 것만 끝내고 끈다.', w: { discipline: 2, recovery: 1 }, sr: 0, al: 0, tag: null },
+      { text: '내일 일정이 괜찮은지 확인하고 조금 더 본다.', w: { mind: 3 }, sr: 0, al: 0, tag: null },
+      { text: '시간 가는 줄 모르고 계속 본다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q77', stage: 'scenario', category: 'care', situation: '가까운 어른께 한동안 연락을 못 했어요.', choices: [
+      { text: '오늘 바로 전화한다.', w: { care: 4 }, sr: 0, al: 2, tag: null },
+      { text: '주말에 찾아갈 날을 잡는다.', w: { care: 3, discipline: 1, lead: 1 }, sr: 0, al: 2, tag: null },
+      { text: '안부 메시지와 사진을 보낸다.', w: { care: 3, create: 1 }, sr: 0, al: 1, tag: null },
+      { text: '바쁜 일이 끝나면 연락하기로 미룬다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q78', stage: 'scenario', category: 'mind', situation: '외국어로 된 안내문을 읽어야 해요.', choices: [
+      { text: '사전을 찾아가며 직접 읽어 본다.', w: { mind: 4, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '번역기를 돌려 빠르게 파악한다.', w: { mind: 3 }, sr: 0, al: 0, tag: null },
+      { text: '이참에 그 언어를 조금씩 배워 보기로 한다.', w: { mind: 3, discipline: 2 }, sr: 1, al: 0, tag: null },
+      { text: '잘 아는 사람에게 부탁한다.', w: { care: 1, lead: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q79', stage: 'scenario', category: 'fit', situation: '건강검진에서 운동이 부족하다는 말을 들었어요.', choices: [
+      { text: '오늘부터 매일 걷기를 시작한다.', w: { fit: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '운동 계획표를 만들고 기록한다.', w: { discipline: 3, mind: 1, fit: 1 }, sr: 1, al: 0, tag: null },
+      { text: '식단부터 바꿔 본다.', w: { recovery: 3, discipline: 2 }, sr: 1, al: 0, tag: null },
+      { text: '같이 운동할 사람을 구한다.', w: { lead: 2, care: 1, fit: 2 }, sr: 0, al: 0, tag: null },
+      { text: '당장은 바꾸지 않는다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q80', stage: 'scenario', category: 'money', situation: '갖고 싶던 물건이 중고로 싸게 나왔어요.', choices: [
+      { text: '상태를 꼼꼼히 확인하고 산다.', w: { money: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '이번 달 예산에 여유가 있는지 먼저 본다.', w: { money: 3, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '정말 필요한지 하루 더 생각한다.', w: { discipline: 3, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '기회라고 생각해 바로 산다.', w: { charm: 1, esteem: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q81', stage: 'scenario', category: 'charm', situation: '처음 가는 모임에 초대받았어요.', choices: [
+      { text: '깔끔하게 차려입고 간다.', w: { charm: 4, esteem: 1 }, sr: 1, al: 0, tag: null },
+      { text: '먼저 인사하고 이름을 외운다.', w: { lead: 2, care: 2, charm: 1 }, sr: 0, al: 1, tag: null },
+      { text: '어떤 사람들이 오는지 미리 알아본다.', w: { mind: 3, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '조용히 분위기를 보다가 편한 사람과 이야기한다.', w: { recovery: 2, care: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q82', stage: 'scenario', category: 'divine', situation: '길에서 모금 활동을 하는 사람이 말을 걸어요.', choices: [
+      { text: '멈춰서 이야기를 들어 본다.', w: { care: 2, divine: 2 }, sr: 0, al: 1, tag: null },
+      { text: '취지가 믿을 만한지 확인하고 참여한다.', w: { mind: 3, divine: 2 }, sr: 0, al: 1, tag: null },
+      { text: '정중히 거절하고 지나간다.', w: { esteem: 3, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '못 본 척 지나간다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q83', stage: 'scenario', category: 'lead', situation: '회의가 길어지는데 결론이 나지 않아요.', choices: [
+      { text: '지금까지 나온 내용을 정리해 선택지를 제시한다.', w: { lead: 4, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '다음 회의까지 각자 할 일을 나누자고 한다.', w: { lead: 3, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '의견이 다른 사람의 이야기를 더 들어 본다.', w: { care: 3, mind: 1 }, sr: 0, al: 1, tag: null },
+      { text: '조용히 끝나기를 기다린다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q84', stage: 'scenario', category: 'create', situation: '휴대폰 사진첩에 사진이 수천 장 쌓였어요.', choices: [
+      { text: '좋은 사진을 골라 앨범이나 영상으로 만든다.', w: { create: 4, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '날짜·주제별로 정리한다.', w: { discipline: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '필요 없는 사진을 지워 용량을 확보한다.', w: { discipline: 3, mind: 1 }, sr: 0, al: 0, tag: null },
+      { text: '그대로 둔다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q85', stage: 'scenario', category: 'recovery', situation: '감기 기운이 있는데 오늘 운동 계획이 있어요.', choices: [
+      { text: '운동을 쉬고 따뜻하게 쉰다.', w: { recovery: 4, esteem: 1 }, sr: 2, al: 0, tag: null },
+      { text: '강도를 낮춰 가볍게 한다.', w: { fit: 2, recovery: 2, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '계획대로 한다.', w: { discipline: 3, fit: 2 }, sr: 0, al: 0, tag: null },
+      { text: '병원이나 약국에 먼저 들른다.', w: { recovery: 3, mind: 2 }, sr: 1, al: 0, tag: null }
+    ] },
+    { id: 'Q86', stage: 'scenario', category: 'esteem', situation: '친구가 농담으로 내 약점을 건드렸어요.', choices: [
+      { text: '그 말은 불편하다고 바로 말한다.', w: { esteem: 4, lead: 1 }, sr: 3, al: 0, tag: null },
+      { text: '웃어넘기고 나중에 따로 이야기한다.', w: { care: 2, esteem: 2, mind: 1 }, sr: 1, al: 0, tag: null },
+      { text: '나도 농담으로 받아친다.', w: { charm: 2, create: 2 }, sr: 0, al: 0, tag: null },
+      { text: '아무 말 못 하고 넘어간다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q87', stage: 'scenario', category: 'discipline', situation: '목표를 세운 지 3주, 흐지부지되고 있어요.', choices: [
+      { text: '목표를 더 작게 쪼개 다시 시작한다.', w: { discipline: 3, mind: 2 }, sr: 1, al: 0, tag: null },
+      { text: '달력에 매일 표시하며 기록한다.', w: { discipline: 4 }, sr: 1, al: 0, tag: null },
+      { text: '같이 할 사람을 찾아 서로 확인한다.', w: { lead: 2, care: 1, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '나와 맞지 않는 목표였다고 보고 바꾼다.', w: { esteem: 2, mind: 2, create: 1 }, sr: 1, al: 0, tag: null },
+      { text: '그만둔다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q88', stage: 'scenario', category: 'care', situation: '새로 들어온 사람이 혼자 점심을 먹으려 해요.', choices: [
+      { text: '같이 먹자고 먼저 말한다.', w: { care: 4, lead: 1 }, sr: 0, al: 2, tag: null },
+      { text: '주변 맛집을 알려 준다.', w: { care: 3 }, sr: 0, al: 1, tag: null },
+      { text: '다음에 여럿이 갈 때 부른다.', w: { care: 2, lead: 2 }, sr: 0, al: 1, tag: null },
+      { text: '혼자 있고 싶을 수도 있으니 그대로 둔다.', w: { care: 1, mind: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q89', stage: 'scenario', category: 'mind', situation: '중요한 결정을 앞두고 정보가 너무 많아요.', choices: [
+      { text: '기준을 정하고 표로 비교한다.', w: { mind: 4, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '경험해 본 사람에게 물어본다.', w: { care: 1, lead: 2, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '직감을 믿고 정한다.', w: { esteem: 3, create: 2 }, sr: 1, al: 0, tag: null },
+      { text: '하루 자고 다시 생각한다.', w: { recovery: 3, mind: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q90', stage: 'scenario', category: 'fit', situation: '약속 장소까지 걸어서 25분, 버스로 10분이에요. 시간은 넉넉해요.', choices: [
+      { text: '걸어간다.', w: { fit: 4, money: 1 }, sr: 1, al: 0, tag: null },
+      { text: '버스를 타고 가서 여유 있게 기다린다.', w: { recovery: 2, discipline: 2 }, sr: 0, al: 0, tag: null },
+      { text: '걸으면서 음성 강의를 듣는다.', w: { fit: 2, mind: 3 }, sr: 0, al: 0, tag: null },
+      { text: '자전거를 탄다.', w: { fit: 3, create: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q91', stage: 'scenario', category: 'money', situation: '예상하지 못한 수리비가 나갔어요.', choices: [
+      { text: '이번 달 지출 계획을 다시 짠다.', w: { money: 4, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '비상금 통장을 만들기로 한다.', w: { money: 3, mind: 1, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '어쩔 수 없다고 생각하고 넘긴다.', w: { recovery: 3, esteem: 1 }, sr: 1, al: 0, tag: null },
+      { text: '추가로 벌 방법을 찾아본다.', w: { money: 3, create: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q92', stage: 'scenario', category: 'charm', situation: '프로필 사진을 바꾸려고 해요.', choices: [
+      { text: '잘 나온 사진을 고르고 보정한다.', w: { charm: 4, create: 1 }, sr: 1, al: 0, tag: null },
+      { text: '직접 새로 찍는다.', w: { create: 3, charm: 2 }, sr: 1, al: 0, tag: null },
+      { text: '꾸미지 않은 자연스러운 사진으로 한다.', w: { esteem: 3, charm: 1 }, sr: 2, al: 0, tag: null },
+      { text: '친구에게 골라 달라고 한다.', w: { care: 2, lead: 1, charm: 1 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q93', stage: 'scenario', category: 'divine', situation: '약속에 늦을 것 같아요. 그럴듯한 핑계를 댈 수도 있어요.', choices: [
+      { text: '늦는 이유를 사실대로 말하고 사과한다.', w: { divine: 4, esteem: 1 }, sr: 0, al: 1, tag: null },
+      { text: '미리 연락해 도착 시간을 알린다.', w: { care: 3, discipline: 2 }, sr: 0, al: 1, tag: null },
+      { text: '돈이 들더라도 빠른 교통편으로 시간을 맞춘다.', w: { discipline: 3, care: 1 }, sr: 0, al: 0, tag: null },
+      { text: '핑계를 대고 넘어간다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q94', stage: 'scenario', category: 'lead', situation: '이웃 단체 대화방에서 소음 문제로 분위기가 험악해졌어요.', choices: [
+      { text: '차분하게 규칙을 정하자고 제안한다.', w: { lead: 4, care: 1 }, sr: 0, al: 1, tag: null },
+      { text: '당사자들에게 따로 연락해 중재한다.', w: { care: 3, lead: 2 }, sr: 0, al: 2, tag: null },
+      { text: '관리하는 곳에 정식으로 알린다.', w: { discipline: 2, mind: 2, lead: 1 }, sr: 0, al: 0, tag: null },
+      { text: '조용히 지켜본다.', w: {  }, sr: 0, al: 0, tag: 'inaction' }
+    ] },
+    { id: 'Q95', stage: 'scenario', category: 'create', situation: '지루하게 반복되는 일이 있어요.', choices: [
+      { text: '더 빠른 방법을 궁리해 바꿔 본다.', w: { create: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '음악을 틀고 리듬에 맞춰 해치운다.', w: { create: 2, recovery: 2, discipline: 1 }, sr: 0, al: 0, tag: null },
+      { text: '시간을 정해 집중해서 끝낸다.', w: { discipline: 4 }, sr: 0, al: 0, tag: null },
+      { text: '동료와 나눠 번갈아 한다.', w: { lead: 2, care: 2 }, sr: 0, al: 0, tag: null }
+    ] },
+    { id: 'Q96', stage: 'scenario', category: 'recovery', situation: '스트레스가 쌓인 날, 일을 마친 뒤예요.', choices: [
+      { text: '땀이 나게 운동한다.', w: { fit: 4, recovery: 1 }, sr: 1, al: 0, tag: null },
+      { text: '맛있는 것을 먹으며 쉰다.', w: { recovery: 4 }, sr: 1, al: 0, tag: null },
+      { text: '친구에게 이야기를 털어놓는다.', w: { care: 3, recovery: 2 }, sr: 0, al: 0, tag: null },
+      { text: '그림·음악·글로 풀어낸다.', w: { create: 4, recovery: 1 }, sr: 1, al: 0, tag: null },
+      { text: '왜 그랬는지 글로 정리해 본다.', w: { mind: 3, esteem: 2 }, sr: 1, al: 0, tag: null }
+    ] },
+    { id: 'Q97', stage: 'scenario', category: 'esteem', situation: '칭찬을 받았어요.', choices: [
+      { text: '고맙다고 하고 기쁘게 받아들인다.', w: { esteem: 4, charm: 1 }, sr: 3, al: 0, tag: null },
+      { text: '도와준 사람들 덕분이라고 말한다.', w: { care: 3, divine: 2 }, sr: 0, al: 2, tag: null },
+      { text: '다음에 더 잘할 점을 찾는다.', w: { discipline: 2, mind: 3 }, sr: 0, al: 0, tag: null },
+      { text: '별것 아니라고 손사래를 친다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q98', stage: 'scenario', category: 'discipline', situation: '장을 보러 갔는데 사려던 목록에 없는 할인 상품이 많아요.', choices: [
+      { text: '목록에 있는 것만 산다.', w: { discipline: 4, money: 1 }, sr: 0, al: 0, tag: null },
+      { text: '꼭 쓸 것만 골라 조금 더 산다.', w: { money: 3, mind: 2 }, sr: 0, al: 0, tag: null },
+      { text: '할인 상품으로 이번 주 메뉴를 새로 짠다.', w: { create: 3, money: 2 }, sr: 0, al: 0, tag: null },
+      { text: '싸니까 넉넉히 담는다.', w: {  }, sr: 0, al: 0, tag: 'no_weight' }
+    ] },
+    { id: 'Q99', stage: 'scenario', category: 'care', situation: '친구가 고민을 털어놓는데 해결책은 바라지 않는 눈치예요.', choices: [
+      { text: '끝까지 들어 주며 공감한다.', w: { care: 4, divine: 1 }, sr: 0, al: 2, tag: null },
+      { text: '그래도 도움이 될 방법을 정리해 준다.', w: { mind: 3, lead: 1, care: 1 }, sr: 0, al: 1, tag: null },
+      { text: '비슷한 내 경험을 이야기해 준다.', w: { care: 2, charm: 2 }, sr: 0, al: 0, tag: null },
+      { text: '기분 전환하러 같이 나가자고 한다.', w: { lead: 2, care: 2, fit: 1 }, sr: 0, al: 1, tag: null }
+    ] },
+    { id: 'Q100', stage: 'scenario', category: 'mixed', situation: '비가 와서 주말 야외 계획이 취소됐어요.', choices: [
+      { text: '집에서 할 수 있는 운동을 한다.', w: { fit: 4, discipline: 1 }, sr: 1, al: 0, tag: null },
+      { text: '미뤄 둔 책이나 강의를 본다.', w: { mind: 4 }, sr: 0, al: 0, tag: null },
+      { text: '집을 정리하고 꾸민다.', w: { charm: 2, discipline: 2, create: 1 }, sr: 1, al: 0, tag: null },
+      { text: '친구를 집으로 초대한다.', w: { care: 3, lead: 2 }, sr: 0, al: 1, tag: null },
+      { text: '느긋하게 쉰다.', w: { recovery: 4 }, sr: 1, al: 0, tag: null }
     ] }
   ]
 };
