@@ -4,7 +4,7 @@
   const app = document.getElementById('app');
   let S = null;                // 현재 저장 상태
   let players = [];
-  let view = { tab: 'main', date: null };
+  let view = { tab: 'village', date: null };   // 앱을 열면 마을 탭부터 (마을을 못 쓰는 곳에서는 메인)
   let lastSnapshot = null;     // 레벨업·보석 색 변화 알림용
 
   function stopPlayers() { players.forEach(p => p.stop()); players = []; }
@@ -76,19 +76,19 @@
   //  마을을 못 띄우면(파일 하나짜리 앱, three.js 를 못 읽음, WebGL 꺼짐, 20초 넘게 걸림) 예전 초상화 두 장을 대신 보여 준다.
   //  앱이 다른 페이지 안에 들어가 있을 때(window !== top)는 넣지 않는다 — 인터넷이 끊기면 서비스워커가 없는 파일 대신 index.html 을 주므로 겹겹이 들어가는 것을 막음
   const villageOK = () => window === window.top && !!document.querySelector('script[src*="js/app.js"]');
-  let villageTimer = 0;
-  function villageBox(saved) {
+  let villageTimer = 0, villageFailed = false;
+  function villageBox(saved, full) {
     if (!villageOK()) return '';
     const q = ['embed', 'time=auto'];
     if (saved && saved.profile) q.push('hero=' + (saved.profile.look === 'boy' ? 'male' : 'female'));
     let w = 'clear'; try { w = saved ? BM.weather.kind(saved) : 'clear'; } catch (e) { /* 날씨를 몰라도 맑음으로 */ }
     if (w === 'rain' || w === 'snow') q.push('weather=' + w);
-    return '<div class="village-box" id="vbox"><iframe title="시작의 마을" src="village.html#' + q.join('&') + '"></iframe></div>';
+    return '<div class="village-box' + (full ? ' full' : '') + '" id="vbox"><iframe title="시작의 마을" src="village.html#' + q.join('&') + '"></iframe></div>';
   }
-  function villageWatch() {
+  function villageWatch(onFail) {
     const box = document.getElementById('vbox'); if (!box) return;
     const fr = box.querySelector('iframe'), scr = box.closest('.screen');
-    const giveUp = () => { clearTimeout(villageTimer); window.removeEventListener('message', onMsg); if (box.isConnected) { box.remove(); if (scr) scr.classList.remove('has-village'); } };
+    const giveUp = () => { clearTimeout(villageTimer); window.removeEventListener('message', onMsg); if (box.isConnected) { box.remove(); if (scr) scr.classList.remove('has-village'); if (onFail) onFail(); } };
     function onMsg(e) {
       if (!box.isConnected) { window.removeEventListener('message', onMsg); return; }
       if (e.source !== fr.contentWindow || !e.data) return;
@@ -319,17 +319,22 @@
     if (view.date < S.profile.startDate) view.date = S.profile.startDate;
     const R = G.replay(S, today);
     notifyChanges(R);
-    // 탭: 메인 · 수련 · 보석 · 설정 (2026-11-13 사용자 요청. 예전 '기록' 탭은 수련 탭 맨 아래 '지난 기록'으로)
-    const tabHtml = { main: tabMain, quest: tabQuest, gem: tabGem, settings: tabSettings }[view.tab] || tabMain;
+    // 탭: 마을 · 메인 · 수련 · 보석 · 설정 (2026-11-22 사용자 요청: 앱을 열면 마을이 시작 페이지처럼 먼저, 그다음 기존 4개 = 모두 5개)
+    //  마을을 넣을 수 없는 곳(파일 하나짜리 앱 등)이나 마을이 뜨지 못했을 때는 마을 탭 없이 예전 4개
+    const hasVillage = villageOK() && !villageFailed;
+    if (view.tab === 'village' && !hasVillage) view.tab = 'main';
+    const TABS = (hasVillage ? [['village', '마을']] : []).concat([['main', '메인'], ['quest', '수련'], ['gem', '보석'], ['settings', '설정']]);
+    if (!TABS.some(t => t[0] === view.tab)) view.tab = 'main';
+    const tabHtml = { village: tabVillage, main: tabMain, quest: tabQuest, gem: tabGem, settings: tabSettings }[view.tab] || tabMain;
     app.innerHTML =
-      '<div class="screen">' +
+      '<div class="screen' + (view.tab === 'village' ? ' village-tab' : '') + '">' +
       '<div class="spread" style="margin:4px 4px 6px"><div><div class="small gold">용사</div><h2 style="margin:0">' + U.esc(S.profile.name) + '</h2></div>' +
       '<div style="text-align:right;min-width:140px"><div class="count"><span class="gold">Lv.' + R.lv.level + '</span> <span class="small muted">' + U.fmt(R.xp) + ' XP</span></div>' +
       '<div class="bar thin" aria-label="다음 레벨까지"><i style="width:' + (R.lv.into / R.lv.need * 100) + '%;--c:var(--gold)"></i></div></div></div>' +
       tabHtml(R) +
       '</div>' +
-      '<nav class="tabs" aria-label="메뉴"><div class="in">' +
-      [['main', '메인'], ['quest', '수련'], ['gem', '보석'], ['settings', '설정']].map(([k, l]) => '<button class="btn" data-tab="' + k + '" ' + ((view.tab in { main: 1, quest: 1, gem: 1, settings: 1 } ? view.tab : 'main') === k ? 'aria-current="page"' : '') + '>' + l + '</button>').join('') +
+      '<nav class="tabs" aria-label="메뉴"><div class="in" style="grid-template-columns:repeat(' + TABS.length + ',1fr)">' +
+      TABS.map(([k, l]) => '<button class="btn" data-tab="' + k + '" ' + (view.tab === k ? 'aria-current="page"' : '') + '>' + l + '</button>').join('') +
       '</div></nav>';
     const r0 = S.diagnosis.result, top4 = ids => ids.slice(0, BM.CONFIG.gem.colorCount);
     app.querySelectorAll('canvas[data-brooch]').forEach(c => {
@@ -344,6 +349,7 @@
     UI.hydrateGems(app);
     currentScene = null;
     const sc = app.querySelector('canvas[data-scene]'); if (sc) mountScene(sc);
+    if (view.tab === 'village') villageWatch(() => { villageFailed = true; view.tab = 'main'; render(); });   // 마을이 못 뜨면 메인으로
     const wr = app.querySelector('select[data-wregion]');
     if (wr) wr.onchange = () => { S.settings.weather = { mode: 'region', region: wr.value }; persist(); render(); refreshWeather(true).then(() => view.tab === 'settings' && render()); };
     app.onclick = e => onHomeClick(e, R);
@@ -358,6 +364,9 @@
     }
     lastSnapshot = snap;
   }
+
+  // 마을 탭: 시작의 마을을 화면 가득. 주인공은 내 용사 모습, 시간은 자동(마을 안 화살표 단추로 바꿈)
+  function tabVillage() { return villageBox(S, true); }
 
   function tabQuest(R) {
     const d = view.date, today = U.today();
@@ -552,7 +561,7 @@
       case 'reset': {
         if (!(await UI.confirmBox('정말 다시 시작할까요?', '용사 <b>' + U.esc(S.profile.name) + '</b>의 진단 결과와 모든 수련 기록이 이 기기에서 지워져요.', '다음', true))) return;
         if (!(await UI.confirmBox('마지막 확인', '되돌릴 수 없어요. 백업을 내보내지 않았다면 취소하고 먼저 백업해 주세요.', '모두 지우고 새로 시작', true))) return;
-        ST.clear(); S = null; view = { tab: 'main', date: null }; lastSnapshot = null; return render();
+        ST.clear(); S = null; view = { tab: 'village', date: null }; lastSnapshot = null; return render();
       }
     }
   }
@@ -564,7 +573,7 @@
       try {
         const data = ST.importText(String(rd.result));
         if (S && S.profile && !(await UI.confirmBox('백업을 불러올까요?', '지금 기록이 백업 파일 <b>용사 ' + U.esc(data.profile.name) + '</b>의 내용으로 바뀌어요.', '불러오기', true))) return;
-        S = data; view = { tab: 'main', date: null }; lastSnapshot = null; persist(); UI.toast('백업을 불러왔어요.'); render();
+        S = data; view = { tab: 'village', date: null }; lastSnapshot = null; persist(); UI.toast('백업을 불러왔어요.'); render();
       } catch (err) { UI.toast('불러오지 못했어요: ' + err.message, true); }
     };
     rd.onerror = () => UI.toast('파일을 읽지 못했어요.', true);
